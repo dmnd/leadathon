@@ -5,6 +5,10 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  outputFileTracingIncludes: {
+    "**": ["./src/2023.csv"],
+  },
+};
 
 export default config;

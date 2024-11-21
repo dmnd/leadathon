@@ -44,3 +44,6 @@ yarn-error.log*
 
 # idea files
 .idea
+
+# secret data file! DM Desmond for the password to decrypt.
+src/2023.csv
