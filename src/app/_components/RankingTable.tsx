@@ -51,17 +51,17 @@ export default function RankingTable({
             <td
               className={`w-12 select-none pr-1 text-right tabular-nums text-white ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
             >
-              <span
-                className={`inline-block h-6 w-6 rounded-full border-solid border-white ${i < awards ? "border-2 border-white/100 text-center" : "border-0 border-white/30"} ${r.highlight ? "border-2 border-white/100" : "border"}`}
-              >
-                {i < awards ? (
-                  <span className="relative -top-0.5 text-xs text-white/100">
+              {i < awards ? (
+                <span
+                  className={`inline-block h-6 w-6 rounded-full border-solid border-white text-center ${r.highlight ? "border-2" : "border"}`}
+                >
+                  <span className="relative -top-0.5 text-xs text-white">
                     #{rank}
                   </span>
-                ) : (
-                  <span>#{rank}</span>
-                )}
-              </span>
+                </span>
+              ) : (
+                <span className="pr-1">#{rank}</span>
+              )}
             </td>
             <td className={r.highlight ? highlightStyles : ""}>{r.contents}</td>
             <td
