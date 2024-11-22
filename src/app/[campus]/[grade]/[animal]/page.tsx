@@ -37,9 +37,23 @@ export default async function Animal({
       <div>
         <Link
           href={`/${campus.toLowerCase()}`}
-          className="text-white/50 hover:text-white"
+          className="inline-block text-white/50 transition-transform hover:-translate-y-px hover:text-white"
         >
-          Yu Ming {campuses[campus]} campus
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="relative -top-px inline-block"
+          >
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          Back to Yu Ming {campuses[campus]} campus
         </Link>
         <h1 className="text-5xl font-extrabold capitalize tracking-tight">
           {humanize(animal)} class readathon
