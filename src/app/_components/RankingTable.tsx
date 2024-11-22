@@ -49,13 +49,14 @@ export default function RankingTable({
         {rows3.map(([rank, r], i) => (
           <tr className={"whitespace-nowrap"} key={r.key}>
             <td
-              className={`w-12 select-none pr-1 text-right tabular-nums text-white ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
+              className={`w-12 select-none py-1 pr-1 text-right tabular-nums text-white ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
             >
               {i < awards ? (
                 <span
-                  className={`inline-block h-6 w-6 rounded-full border-solid border-white text-center ${r.highlight ? "border-2" : "border"}`}
+                  className={`relative inline-block h-6 w-6 rounded-full text-center ${r.highlight ? "bg-white/90" : "bg-white/45"}`}
+                  style={{ mixBlendMode: "screen", color: "black" }}
                 >
-                  <span className="relative -top-0.5 text-xs text-white">
+                  <span className="relative -top-0.5 text-xs font-bold">
                     #{rank}
                   </span>
                 </span>
