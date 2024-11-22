@@ -6,6 +6,7 @@ import RankingTable from "./RankingTable";
 import { ClockIcon } from "./ClockIcon";
 import GradeRankingTable from "./GradeRankingTable";
 import { Box } from "./Box";
+import { Minutes } from "./Minutes";
 
 export default function TopReadingClass({
   classes,
@@ -46,7 +47,7 @@ export default function TopReadingClass({
                   contents: s.displayName,
                   scoreCell: (
                     <>
-                      <ClockIcon /> {s.minutes.toLocaleString()}
+                      <ClockIcon /> <Minutes minutes={s.minutes} />
                     </>
                   ),
                   minutes: s.minutes,

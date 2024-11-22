@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ClockIcon } from "./ClockIcon";
 import type { Class } from "../../types";
 import { humanize } from "~/string";
+import { Minutes } from "./Minutes";
 
 function toURL(c: Class) {
   return `/${c.campus.toLowerCase()}/${
@@ -32,7 +33,7 @@ export default function GradeRankingTable({
         ),
         scoreCell: (
           <>
-            <ClockIcon /> {c.minutes.toLocaleString()}
+            <ClockIcon /> <Minutes minutes={c.minutes} />
           </>
         ),
         minutes: c.minutes,

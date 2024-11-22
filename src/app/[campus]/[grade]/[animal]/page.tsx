@@ -2,11 +2,12 @@ import Link from "next/link";
 import { ClockIcon } from "~/app/_components/ClockIcon";
 import { GradeLabel } from "~/app/_components/GradeLabel";
 import GradeRankingTable from "~/app/_components/GradeRankingTable";
+import { Minutes } from "~/app/_components/Minutes";
 import RankingTable from "~/app/_components/RankingTable";
 import { className, loadData } from "~/data";
+import { humanize } from "~/string";
 import { campuses } from "~/types";
 import { Box } from "../../../_components/Box";
-import { humanize } from "~/string";
 
 export default async function Animal({
   params,
@@ -91,7 +92,7 @@ export default async function Animal({
               contents: s.displayName,
               scoreCell: (
                 <>
-                  <ClockIcon /> {s.minutes.toLocaleString()}
+                  <ClockIcon /> <Minutes minutes={s.minutes} />
                 </>
               ),
               minutes: s.minutes,

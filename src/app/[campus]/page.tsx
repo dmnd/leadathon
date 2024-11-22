@@ -6,6 +6,7 @@ import { ClockIcon } from "../_components/ClockIcon";
 import PledgeIcon from "../_components/PledgeIcon";
 import RankingTable from "../_components/RankingTable";
 import { Box } from "../_components/Box";
+import { Minutes } from "../_components/Minutes";
 
 export default async function Home({
   params,
@@ -61,7 +62,7 @@ export default async function Home({
               contents: s.displayName,
               scoreCell: (
                 <>
-                  <ClockIcon /> {s.minutes.toLocaleString()}{" "}
+                  <ClockIcon /> <Minutes minutes={s.minutes} />
                 </>
               ),
               minutes: s.minutes,
