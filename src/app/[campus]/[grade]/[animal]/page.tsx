@@ -99,22 +99,25 @@ export default async function Animal({
           <h2 className="text-xl font-bold">
             {humanize(animal)} class readers
           </h2>
-          <RankingTable
-            showPledges
-            rows={students.map((s) => ({
-              key: s.id,
-              contents: s.displayName,
-              scoreCell: (
-                <>
-                  <ClockIcon /> <Minutes minutes={s.minutes} />
-                </>
-              ),
-              minutes: s.minutes,
-              pledges: s.pledgesOnline,
-              score: s.minutes,
-            }))}
-            awards={3}
-          />
+          {(students[0]?.minutes ?? 0 > 0) ? (
+            <RankingTable
+              showPledges
+              rows={students.map((s) => ({
+                key: s.id,
+                contents: s.displayName,
+                scoreCell: (
+                  <>
+                    <ClockIcon /> <Minutes minutes={s.minutes} />
+                  </>
+                ),
+                pledges: s.pledgesOnline,
+                score: s.minutes,
+              }))}
+              awards={3}
+            />
+          ) : (
+            <span className="text-white/70">None yet. Log your reading!</span>
+          )}
         </Box>
       </div>
     </div>

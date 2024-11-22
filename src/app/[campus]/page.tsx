@@ -55,42 +55,47 @@ export default async function Home({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-8">
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top readers</h2>
-
-          <RankingTable
-            rows={topReaders.map((s) => ({
-              contents: s.displayName,
-              scoreCell: (
-                <>
-                  <ClockIcon /> <Minutes minutes={s.minutes} />
-                </>
-              ),
-              minutes: s.minutes,
-              pledges: s.pledgesOnline,
-              key: s.id,
-              score: s.minutes,
-            }))}
-            awards={10}
-          />
+          {(topReaders[0]?.minutes ?? 0 > 0) ? (
+            <RankingTable
+              rows={topReaders.map((s) => ({
+                contents: s.displayName,
+                scoreCell: (
+                  <>
+                    <ClockIcon /> <Minutes minutes={s.minutes} />
+                  </>
+                ),
+                pledges: s.pledgesOnline,
+                key: s.id,
+                score: s.minutes,
+              }))}
+              awards={10}
+            />
+          ) : (
+            <span className="text-white/70">Nobody yet. Log your reading!</span>
+          )}
         </Box>
 
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top pledgers</h2>
-          <RankingTable
-            rows={topPledgers.map((s) => ({
-              contents: s.displayName,
-              scoreCell: (
-                <>
-                  {s.pledgesOnline.toLocaleString()}{" "}
-                  <span className="text-sm">pledges</span>
-                </>
-              ),
-              minutes: s.minutes,
-              pledges: s.pledgesOnline,
-              key: s.id,
-              score: s.pledgesOnline,
-            }))}
-            awards={5}
-          />
+          {(topPledgers[0]?.pledgesOnline ?? 0 > 0) ? (
+            <RankingTable
+              rows={topPledgers.map((s) => ({
+                contents: s.displayName,
+                scoreCell: (
+                  <>
+                    {s.pledgesOnline.toLocaleString()}{" "}
+                    <span className="text-sm">pledges</span>
+                  </>
+                ),
+                pledges: s.pledgesOnline,
+                key: s.id,
+                score: s.pledgesOnline,
+              }))}
+              awards={5}
+            />
+          ) : (
+            <span className="text-white/70">None yet. Go get pledges!</span>
+          )}
         </Box>
       </div>
     </div>

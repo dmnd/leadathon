@@ -56,14 +56,13 @@ export async function loadData(campus: string) {
   );
 
   const students = rawStudents.flatMap((s) => {
-    const match = /^(\w)(\w+)(\w{3})\s\((\d+)\)$/.exec(s["Class Name"]);
+    const match = /^(\w)(\w+)(\w{3}).*$/.exec(s["Class Name"]);
     if (!match) {
       console.error("Failed to match", s["Class Name"]);
       return [];
     }
 
-    const [, grade, animal, campus, rawN] = match;
-    const classSize = Number.parseInt(rawN ?? "0");
+    const [, grade, animal, campus] = match;
 
     invariant(campus != null);
     invariant(animal != null);
@@ -82,7 +81,6 @@ export async function loadData(campus: string) {
         campus,
         animal: kebabify(animal),
         grade: grade === "K" ? 0 : Number.parseInt(grade),
-        classSize,
         pledgesOnline: s["Online Donation #"],
         pledgesOffline: 0, // TODO
         minutes: s["Minute Count"],

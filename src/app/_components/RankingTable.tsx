@@ -3,6 +3,7 @@
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import PledgeIcon from "./PledgeIcon";
+import { pluralize } from "~/string";
 
 const highlightStyles =
   "bg-yellow-300/70 font-bold shadow-2xl text-shadow py-1";
@@ -15,7 +16,6 @@ export default function RankingTable({
   rows: Array<{
     contents: React.ReactNode;
     scoreCell: React.ReactNode;
-    minutes: number;
     pledges: number;
     key: string;
     score: number;
@@ -51,22 +51,24 @@ export default function RankingTable({
             <td
               className={`w-12 select-none py-1 pr-1 text-right tabular-nums text-white ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
             >
-              {i < awards ? (
-                <span
-                  className={`relative inline-block h-6 w-6 rounded-full text-center ${r.highlight ? "bg-white/90" : "bg-white/45"}`}
-                  style={{ mixBlendMode: "screen", color: "black" }}
-                >
-                  <span className="relative -top-0.5 text-xs font-bold">
-                    <span className="text-[.6rem]">#</span>
+              {r.score > 0 ? (
+                i < awards ? (
+                  <span
+                    className={`relative inline-block h-6 w-6 rounded-full text-center ${r.highlight ? "bg-white/90" : "bg-white/45"}`}
+                    style={{ mixBlendMode: "screen", color: "black" }}
+                  >
+                    <span className="relative -top-0.5 text-xs font-bold">
+                      <span className="text-[.6rem]">#</span>
+                      {rank}
+                    </span>
+                  </span>
+                ) : (
+                  <span className="pr-1">
+                    <span className="text-xs">#</span>
                     {rank}
                   </span>
-                </span>
-              ) : (
-                <span className="pr-1">
-                  <span className="text-xs">#</span>
-                  {rank}
-                </span>
-              )}
+                )
+              ) : null}
             </td>
             <td className={r.highlight ? highlightStyles : ""}>{r.contents}</td>
             <td
@@ -80,7 +82,7 @@ export default function RankingTable({
               >
                 {r.pledges >= maxPledges && (
                   <Tippy
-                    content="Pledge leader"
+                    content={`Pledge leader (${r.pledges} ${pluralize("pledge", r.pledges)})`}
                     delay={0}
                     animation={false}
                     placement="right"

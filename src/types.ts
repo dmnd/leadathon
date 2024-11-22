@@ -25,7 +25,6 @@ export type Student = {
   campus: string;
   animal: string;
   grade: number;
-  classSize: number;
   pledgesOnline: number;
   pledgesOffline: number;
   minutes: number;

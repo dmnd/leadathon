@@ -18,3 +18,7 @@ export function humanize(s: string): string {
     .replace(/-/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
+
+export function pluralize(word: string, count: number): string {
+  return count === 1 ? word : `${word}s`;
+}
