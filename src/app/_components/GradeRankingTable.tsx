@@ -41,6 +41,7 @@ export default function GradeRankingTable({
         score: c.minutes,
         highlight: c.className === viewer,
       }))}
+      awards={1}
     />
   );
 }

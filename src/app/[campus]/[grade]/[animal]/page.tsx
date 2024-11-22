@@ -99,6 +99,7 @@ export default async function Animal({
               pledges: s.pledgesOnline,
               score: s.minutes,
             }))}
+            awards={3}
           />
         </Box>
       </div>

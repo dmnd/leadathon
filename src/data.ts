@@ -122,7 +122,7 @@ export async function loadData(campus: string) {
 
   const topPledgers = campusStudents
     .sort((a, b) => b.pledgesOnline - a.pledgesOnline)
-    .slice(0, 5);
+    .slice(0, 10);
 
   const classes = new Map(
     Array.from(

@@ -69,6 +69,7 @@ export default async function Home({
               key: s.id,
               score: s.minutes,
             }))}
+            awards={10}
           />
         </Box>
 
@@ -88,6 +89,7 @@ export default async function Home({
               key: s.id,
               score: s.pledgesOnline,
             }))}
+            awards={5}
           />
         </Box>
       </div>

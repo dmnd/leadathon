@@ -10,6 +10,7 @@ const highlightStyles =
 export default function RankingTable({
   rows,
   showPledges = false,
+  awards,
 }: {
   rows: Array<{
     contents: React.ReactNode;
@@ -21,6 +22,7 @@ export default function RankingTable({
     highlight?: boolean;
   }>;
   showPledges?: boolean;
+  awards: number;
 }) {
   const rows2: Array<[number, (typeof rows)[0]]> = [];
   let rank = 1;
@@ -44,12 +46,22 @@ export default function RankingTable({
   return (
     <table className="w-full">
       <tbody>
-        {rows3.map(([rank, r]) => (
+        {rows3.map(([rank, r], i) => (
           <tr className={"whitespace-nowrap"} key={r.key}>
             <td
-              className={`w-12 select-none pr-2 text-right tabular-nums text-white ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
+              className={`w-12 select-none pr-1 text-right tabular-nums text-white ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
             >
-              #{rank}
+              <span
+                className={`inline-block h-6 w-6 rounded-full border-solid border-white ${i < awards ? "border-2 border-white/100 text-center" : "border-0 border-white/30"} ${r.highlight ? "border-2 border-white/100" : "border"}`}
+              >
+                {i < awards ? (
+                  <span className="relative -top-0.5 text-xs text-white/100">
+                    #{rank}
+                  </span>
+                ) : (
+                  <span>#{rank}</span>
+                )}
+              </span>
             </td>
             <td className={r.highlight ? highlightStyles : ""}>{r.contents}</td>
             <td

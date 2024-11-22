@@ -52,6 +52,7 @@ export default function TopReadingClass({
                   pledges: s.pledgesOnline,
                   score: s.minutes,
                 }))}
+              awards={5}
             />
 
             <h2 className="text-xl font-bold">Top pledgers</h2>
@@ -74,6 +75,7 @@ export default function TopReadingClass({
                   pledges: s.pledgesOnline,
                   score: s.pledgesOnline,
                 }))}
+              awards={3}
             />
           </Box>
         );
