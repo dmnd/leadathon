@@ -57,11 +57,15 @@ export default function RankingTable({
                   style={{ mixBlendMode: "screen", color: "black" }}
                 >
                   <span className="relative -top-0.5 text-xs font-bold">
-                    #{rank}
+                    <span className="text-[.6rem]">#</span>
+                    {rank}
                   </span>
                 </span>
               ) : (
-                <span className="pr-1">#{rank}</span>
+                <span className="pr-1">
+                  <span className="text-xs">#</span>
+                  {rank}
+                </span>
               )}
             </td>
             <td className={r.highlight ? highlightStyles : ""}>{r.contents}</td>
