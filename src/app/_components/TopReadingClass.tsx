@@ -37,7 +37,6 @@ export default function TopReadingClass({
 
             <h2 className="text-xl font-bold">Top readers</h2>
             <RankingTable
-              showPledges
               rows={classes
                 .flatMap((c) => c.students)
                 .sort((a, b) => b.minutes - a.minutes)
