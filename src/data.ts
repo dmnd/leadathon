@@ -17,7 +17,7 @@ export function className(x: {
 
 async function parseCSV(): Promise<Papa.ParseResult<Row>> {
   // const filePath = path.join(process.cwd(), "./src/2023.csv");
-  const filePath = path.join(process.cwd(), "./src/2024-11-22T1143.csv");
+  const filePath = path.join(process.cwd(), "./src/2024-11-22T1340.csv");
   const file = fs.readFileSync(filePath, "utf8");
   return new Promise((resolve, reject) => {
     Papa.parse<Row>(file, {
