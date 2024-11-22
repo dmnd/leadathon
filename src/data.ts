@@ -116,11 +116,11 @@ export async function loadData(campus: string) {
   }
 
   const topReaders = campusStudents
-    .sort((a, b) => b.minutes - a.minutes)
+    .sort((a, b) => b.minutes - a.minutes || b.pledgesOnline - a.pledgesOnline)
     .slice(0, 10);
 
   const topPledgers = campusStudents
-    .sort((a, b) => b.pledgesOnline - a.pledgesOnline)
+    .sort((a, b) => b.pledgesOnline - a.pledgesOnline || b.minutes - a.minutes)
     .slice(0, 10);
 
   const classes = new Map(

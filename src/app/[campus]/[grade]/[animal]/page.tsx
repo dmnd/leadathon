@@ -23,11 +23,13 @@ export default async function Animal({
   const classroomName = className({ grade, animal, campus });
   const classroom = classes.get(classroomName)!;
 
-  const students = classroom.students.sort((a, b) => b.minutes - a.minutes);
+  const students = classroom.students.sort(
+    (a, b) => b.minutes - a.minutes || b.pledgesOnline - a.pledgesOnline,
+  );
 
   const gradeClasses = [...classes.values()]
     .filter((c) => c.grade === classroom.grade)
-    .sort((a, b) => b.minutes - a.minutes);
+    .sort((a, b) => b.minutes - a.minutes || b.pledges - a.pledges);
   const position = gradeClasses.findIndex((c) => c === classroom) + 1;
 
   const classPledges = students.reduce((acc, s) => acc + s.pledgesOnline, 0);

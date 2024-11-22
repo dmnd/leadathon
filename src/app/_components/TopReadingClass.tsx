@@ -32,7 +32,10 @@ export default function TopReadingClass({
       {[...minutesGradeLeagues.entries()].sort().map(([league, classes]) => {
         const topReaders = classes
           .flatMap((c) => c.students)
-          .sort((a, b) => b.minutes - a.minutes)
+          .sort(
+            (a, b) =>
+              b.minutes - a.minutes || b.pledgesOnline - a.pledgesOnline,
+          )
           .slice(0, 5)
           .map((s) => ({
             key: s.id,
@@ -48,7 +51,10 @@ export default function TopReadingClass({
 
         const topPledgers = classes
           .flatMap((c) => c.students)
-          .sort((a, b) => b.pledgesOnline - a.pledgesOnline)
+          .sort(
+            (a, b) =>
+              b.pledgesOnline - a.pledgesOnline || b.minutes - a.minutes,
+          )
           .slice(0, 3)
           .map((s) => ({
             key: s.id,
