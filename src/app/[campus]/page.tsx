@@ -3,7 +3,6 @@ import TopReadingClass from "~/app/_components/TopReadingClass";
 import { loadData } from "~/data";
 import { campuses, type Student } from "~/types";
 import { ClockIcon } from "../_components/ClockIcon";
-import PledgeIcon from "../_components/PledgeIcon";
 import RankingTable from "../_components/RankingTable";
 import { Box } from "../_components/Box";
 import { Minutes } from "../_components/Minutes";
@@ -80,7 +79,8 @@ export default async function Home({
               contents: s.displayName,
               scoreCell: (
                 <>
-                  <PledgeIcon /> {s.pledgesOnline.toLocaleString()}
+                  {s.pledgesOnline.toLocaleString()}{" "}
+                  <span className="text-sm">pledges</span>
                 </>
               ),
               minutes: s.minutes,

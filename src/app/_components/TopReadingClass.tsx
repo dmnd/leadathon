@@ -1,7 +1,6 @@
 import { groupBy } from "../../array";
 import type { Class } from "../../types";
 import { GradeLabel } from "./GradeLabel";
-import PledgeIcon from "./PledgeIcon";
 import RankingTable from "./RankingTable";
 import { ClockIcon } from "./ClockIcon";
 import GradeRankingTable from "./GradeRankingTable";
@@ -67,7 +66,8 @@ export default function TopReadingClass({
                   contents: s.displayName,
                   scoreCell: (
                     <>
-                      <PledgeIcon /> {s.pledgesOnline.toLocaleString()}
+                      {s.pledgesOnline.toLocaleString()}{" "}
+                      <span className="text-sm">pledges</span>
                     </>
                   ),
                   minutes: s.minutes,
