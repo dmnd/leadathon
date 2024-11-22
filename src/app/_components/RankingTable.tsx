@@ -47,7 +47,7 @@ export default function RankingTable({
         {rows3.map(([rank, r]) => (
           <tr className={"whitespace-nowrap"} key={r.key}>
             <td
-              className={`w-12 select-none pr-2 text-right tabular-nums text-white text-opacity-30 ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : ""}`}
+              className={`w-12 select-none pr-2 text-right tabular-nums text-white ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
             >
               #{rank}
             </td>
