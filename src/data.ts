@@ -100,7 +100,8 @@ export async function loadData(campus: string) {
         campus,
         animal: kebabify(animal),
         grade: grade === "K" ? 0 : Number.parseInt(grade),
-        pledgesOnline: s["Online Donation #"],
+        pledgesOnline:
+          s["Online Donation #"] + s["Potential Online Donation #"],
         pledgesOffline: 0, // TODO
         minutes: s["Minute Count"],
       },
