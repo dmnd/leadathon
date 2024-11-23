@@ -7,7 +7,7 @@ import "./src/env.js";
 /** @type {import("next").NextConfig} */
 const config = {
   outputFileTracingIncludes: {
-    "**": ["./src/2023.csv"],
+    "**": ["./src/*.csv"],
   },
 };
 
