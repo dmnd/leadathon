@@ -20,6 +20,7 @@ async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
     .readdirSync(path.join(process.cwd(), "src"))
     .filter((f) => f.endsWith(".csv"))
     .sort();
+  console.log(files);
   const fileName = files.pop()!;
   const filePath = `./src/${fileName}`;
   const match = /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)(\d\d)\.csv$/.exec(fileName);
