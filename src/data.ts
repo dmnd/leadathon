@@ -15,9 +15,23 @@ export function className(x: {
   return `${x.grade === 0 ? "K" : x.grade}${camelify(x.animal)}${x.campus.toUpperCase()}`;
 }
 
-async function parseCSV(): Promise<Papa.ParseResult<Row>> {
-  // const filePath = path.join(process.cwd(), "./src/2023.csv");
-  const filePath = path.join(process.cwd(), "./src/2024-11-22T2006.csv");
+async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
+  const files = fs
+    .readdirSync(path.join(process.cwd(), "src"))
+    .filter((f) => f.endsWith(".csv"))
+    .sort();
+  const fileName = files.pop()!;
+  const filePath = `./src/${fileName}`;
+  const [_, year, month, day, hour, minute] = fileName.match(
+    /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)(\d\d)\.csv$/,
+  )!;
+  const lastUpdate = new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+  );
   const file = fs.readFileSync(filePath, "utf8");
   return new Promise((resolve, reject) => {
     Papa.parse<Row>(file, {
@@ -25,7 +39,7 @@ async function parseCSV(): Promise<Papa.ParseResult<Row>> {
       dynamicTyping: true,
       error: reject,
       complete: function (results) {
-        resolve(results);
+        resolve([results, lastUpdate]);
       },
     });
   });
@@ -45,7 +59,7 @@ function fullName(firstName: string, lastName: string) {
 }
 
 export async function loadData(campus: string) {
-  const csv = await parseCSV();
+  const [csv, lastUpdate] = await parseCSV();
 
   const [badClasses, rawStudents] = partition(
     csv.data,
@@ -152,5 +166,6 @@ export async function loadData(campus: string) {
     classes: campusClasses,
     topReaders,
     topPledgers,
+    lastUpdate,
   };
 }

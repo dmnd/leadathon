@@ -23,6 +23,7 @@ export default async function Home({
     classes: campusClasses,
     topReaders,
     topPledgers,
+    lastUpdate,
   } = await loadData(campus);
 
   const places: Array<[number, Student]> = [];
@@ -97,6 +98,10 @@ export default async function Home({
             <span className="text-white/70">None yet. Go get pledges!</span>
           )}
         </Box>
+      </div>
+
+      <div className="text-sm text-white/50">
+        Data updated {lastUpdate.toLocaleString()}
       </div>
     </div>
   );

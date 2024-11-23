@@ -19,7 +19,7 @@ export default async function Animal({
   const grade = rawGrade === "k" ? 0 : Number.parseInt(rawGrade);
   const campus = (await params).campus.toUpperCase() as keyof typeof campuses;
 
-  const { classes } = await loadData(campus);
+  const { classes, lastUpdate } = await loadData(campus);
   const classroomName = className({ grade, animal, campus });
   const classroom = classes.get(classroomName)!;
 
@@ -121,6 +121,10 @@ export default async function Animal({
             <span className="text-white/70">None yet. Log your reading!</span>
           )}
         </Box>
+      </div>
+
+      <div className="text-sm text-white/50">
+        Data updated {lastUpdate.toLocaleString()}
       </div>
     </div>
   );
