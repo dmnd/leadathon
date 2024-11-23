@@ -22,9 +22,12 @@ async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
     .sort();
   const fileName = files.pop()!;
   const filePath = `./src/${fileName}`;
-  const [_, year, month, day, hour, minute] = fileName.match(
-    /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)(\d\d)\.csv$/,
-  )!;
+  const match = /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)(\d\d)\.csv$/.exec(fileName);
+  if (!match) {
+    throw new Error(`Failed to parse date from ${fileName}`);
+  }
+  const [, year, month, day, hour, minute] = match;
+
   const lastUpdate = new Date(
     Number(year),
     Number(month) - 1,
