@@ -58,7 +58,7 @@ export default async function Animal({
           Back to Yu Ming {campuses[campus]} campus
         </Link>
         <h1 className="text-5xl font-extrabold capitalize tracking-tight">
-          {humanize(animal)} class readathon
+          {classroom.teacher}'s {humanize(animal)} class
         </h1>
       </div>
 

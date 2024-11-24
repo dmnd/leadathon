@@ -13,6 +13,10 @@ export function camelify(s: string): string {
   return s.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 }
 
+export function pascalify(s: string): string {
+  return camelify(s).replace(/^[a-z]/, (c) => c.toUpperCase());
+}
+
 export function humanize(s: string): string {
   return kebabify(s)
     .replace(/-/g, " ")

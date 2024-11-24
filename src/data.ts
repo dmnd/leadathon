@@ -5,14 +5,53 @@ import invariant from "tiny-invariant";
 import { groupBy, partition } from "./array";
 import nekonames from "nekonames";
 import type { Row } from "./types";
-import { camelify, capitalize, kebabify } from "~/string";
+import { capitalize, kebabify, pascalify } from "~/string";
+
+const teachers: Record<string, string> = {
+  "1MonkeyCAR": "Jin Ruoxi",
+  "1TigerCAR": "Zhou Jing",
+  "1ZebraCAR": "Xie Jing",
+  "2HorseCAR": "Yu Zhikai",
+  "2LionCAR": "Teng Qiong",
+  "2OwlCAR": "Liu Xi",
+  KKoalaCAR: "Guo Qiaoling",
+  KPandaCAR: "Luo Qianying",
+  KPenguinCAR: "Cai Yuanxi",
+  "1MonkeyCHE": "Wen Alin",
+  "1TigerCHE": "Liao Yiran",
+  "1ZebraCHE": "Fang Yiwei",
+  "2HorseCHE": "Emily Lu",
+  "2LionCHE": "Yu Zecong",
+  "2OwlCHE": "Shi Longping",
+  "3DogCHE": "Liu Lian",
+  "3PeacockCHE": "Cheng Mengting",
+  "3PhoenixCHE": "Zhu Fengjiao",
+  "3RabbitCHE": "Erin Yi",
+  "3SeaHorseCHE": "Bai Shaojun",
+  "3SeaLionCHE": "Luo Minyu",
+  KKoalaCHE: "Zhang Jiayin",
+  KPandaCHE: "Yang Huize",
+  KPenguinCHE: "Zhang Jiaxin",
+  "4DolphinMLK": "Nie Shanshan",
+  "4QilinMLK": "Tang Yaxing",
+  "4SeaTurtlMLK": "Jiang Ningxin",
+  "5ElephantMLK": "Liu Yu",
+  "5GiraffeMLK": "Chen Jaoling",
+  "5RhinoMLK": "Tascian Ani",
+  "6CraneMLK": "Hui Yue",
+  "6LeopardMLK": "Louis Wu",
+  "7BearMLK": "Shao Yun",
+  "7FalconMLK": "Jennifer Lee",
+  "8PantherMLK": "Xiao Wenjing",
+  "8SharkMLK": "Weng Cheng",
+};
 
 export function className(x: {
   campus: string;
   grade: number;
   animal: string;
 }) {
-  return `${x.grade === 0 ? "K" : x.grade}${camelify(x.animal)}${x.campus.toUpperCase()}`;
+  return `${x.grade === 0 ? "K" : x.grade}${pascalify(x.animal)}${x.campus.toUpperCase()}`;
 }
 
 async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
@@ -145,21 +184,28 @@ export async function loadData(campus: string) {
   const classes = new Map(
     Array.from(
       groupBy(uniqStudents.values(), className).entries(),
-      ([className, students]) => [
-        className,
-        {
-          students,
+      ([className, students]) => {
+        const teacher = teachers[className];
+        if (teacher == null) {
+          console.warn(`No teacher found for ${className}`);
+        }
+        return [
           className,
-          grade: students[0]!.grade,
-          campus: students[0]!.campus,
-          animal: students[0]!.animal,
-          pledges: students.reduce(
-            (x, s) => x + s.pledgesOnline + s.pledgesOffline,
-            0,
-          ),
-          minutes: students.reduce((x, s) => x + s.minutes, 0),
-        },
-      ],
+          {
+            students,
+            teacher,
+            className,
+            grade: students[0]!.grade,
+            campus: students[0]!.campus,
+            animal: students[0]!.animal,
+            pledges: students.reduce(
+              (x, s) => x + s.pledgesOnline + s.pledgesOffline,
+              0,
+            ),
+            minutes: students.reduce((x, s) => x + s.minutes, 0),
+          },
+        ];
+      },
     ),
   );
 
