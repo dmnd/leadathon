@@ -49,11 +49,11 @@ export default async function Home({
         </h1>
         <CampusSelector campus={campus} />
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-8">
+      <div className="grid w-full grid-cols-1 gap-4 md:w-auto md:grid-cols-3 md:gap-8">
         <TopReadingClass classes={campusClasses} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-8">
+      <div className="grid w-full grid-cols-1 gap-4 md:w-auto md:grid-cols-3 md:gap-8">
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top readers</h2>
           {(topReaders[0]?.minutes ?? 0 > 0) ? (
