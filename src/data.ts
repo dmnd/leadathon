@@ -59,7 +59,6 @@ async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
     .readdirSync(path.join(process.cwd(), "src"))
     .filter((f) => f.endsWith(".csv"))
     .sort();
-  console.log(files);
   const fileName = files.pop()!;
   const filePath = `./src/${fileName}`;
   const match = /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)(\d\d)\.csv$/.exec(fileName);
@@ -164,9 +163,7 @@ export async function loadData(campus: string) {
   const campusStudents = Array.from(uniqStudents.values()).filter(
     (s) => s.campus === campus,
   );
-  const studentNames = campusStudents.map((s) =>
-    fullName(s.firstName, s.lastName),
-  );
+  const studentNames = campusStudents.map((s) => s.displayName);
   const displayNames = nekonames(studentNames);
   for (const [, s] of campusStudents.entries()) {
     s.displayName =
