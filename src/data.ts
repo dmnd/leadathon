@@ -34,7 +34,7 @@ const teachers: Record<string, string> = {
   KPenguinCHE: "Zhang Jiaxin",
   "4DolphinMLK": "Nie Shanshan",
   "4QilinMLK": "Tang Yaxing",
-  "4SeaTurtlMLK": "Jiang Ningxin",
+  "4SeaTurtleMLK": "Jiang Ningxin",
   "5ElephantMLK": "Liu Yu",
   "5GiraffeMLK": "Chen Jaoling",
   "5RhinoMLK": "Tascian Ani",
