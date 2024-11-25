@@ -87,9 +87,13 @@ async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
   });
 }
 
+function isMixedCase(s: string) {
+  return s.toLocaleUpperCase() !== s && s.toLocaleLowerCase() !== s;
+}
+
 function cleanupName(s: string) {
   if (s.length < 2) return s;
-  if (s.toLocaleUpperCase() !== s) return s;
+  if (isMixedCase(s)) return s;
 
   const s2 = capitalize(s.toLocaleLowerCase());
   console.log(`cleaned up name ${s} to ${s2}`);
