@@ -25,21 +25,6 @@ export default async function Home({
     lastUpdate,
   } = await loadData(campus);
 
-  const places: Array<[number, Student]> = [];
-  let place = 1;
-  let equalPlace = 0;
-  let score = topPledgers[0]!.pledgesOnline;
-  for (const s of topPledgers) {
-    if (s.pledgesOnline < score) {
-      place = place + equalPlace;
-      equalPlace = 1;
-      score = s.pledgesOnline;
-    } else {
-      equalPlace = equalPlace + 1;
-    }
-    places.push([place, s]);
-  }
-
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
       <div className="flex items-center gap-4">
