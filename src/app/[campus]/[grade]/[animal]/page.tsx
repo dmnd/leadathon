@@ -8,20 +8,28 @@ import { className, loadData } from "~/data";
 import { humanize } from "~/string";
 import { campuses } from "~/types";
 import { Box } from "../../../_components/Box";
+import { notFound } from "next/navigation";
 
 export default async function Animal({
   params,
 }: {
   params: Promise<{ animal: string; grade: string; campus: string }>;
 }) {
-  const { animal } = await params;
+  const campus = (await params).campus.toUpperCase() as keyof typeof campuses;
+  if (!(campus in campuses)) {
+    return notFound();
+  }
+
   const rawGrade = (await params).grade.toLowerCase();
   const grade = rawGrade === "k" ? 0 : Number.parseInt(rawGrade);
-  const campus = (await params).campus.toUpperCase() as keyof typeof campuses;
+  const { animal } = await params;
+  const classroomName = className({ grade, animal, campus });
 
   const { classes, lastUpdate } = await loadData(campus);
-  const classroomName = className({ grade, animal, campus });
-  const classroom = classes.get(classroomName)!;
+  const classroom = classes.get(classroomName);
+  if (classroom == null) {
+    return notFound();
+  }
 
   const students = classroom.students.sort(
     (a, b) => b.minutes - a.minutes || b.pledgesOnline - a.pledgesOnline,

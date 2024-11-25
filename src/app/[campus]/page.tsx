@@ -6,18 +6,17 @@ import { ClockIcon } from "../_components/ClockIcon";
 import RankingTable from "../_components/RankingTable";
 import { Box } from "../_components/Box";
 import { Minutes } from "../_components/Minutes";
+import { notFound } from "next/navigation";
 
 export default async function Home({
   params,
 }: {
   params: Promise<{ campus: string }>;
 }) {
-  // Validate campus parameter
   const campus = (await params).campus.toUpperCase() as keyof typeof campuses;
-  // TODO: fix validation
-  // if (!(campus in campuses)) {
-  //   throw new Error(`Invalid campus '${campus}'`);
-  // }
+  if (!(campus in campuses)) {
+    return notFound();
+  }
 
   const {
     classes: campusClasses,
