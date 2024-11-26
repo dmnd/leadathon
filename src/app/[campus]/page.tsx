@@ -53,7 +53,7 @@ export default async function Home({
       </div>
 
       <div className="grid w-full grid-cols-1 gap-4 md:w-auto md:grid-cols-3 md:gap-8">
-        <Box className="col-span-2">
+        <Box className="md:col-span-2">
           <h2 className="text-xl font-bold">Campuses</h2>
           <RankingTable
             awards={0}
