@@ -1,35 +1,47 @@
 import CampusSelector from "~/app/_components/CampusSelector";
 import TopReadingClass from "~/app/_components/TopReadingClass";
-import { loadData } from "~/data";
-import { campuses, type Student } from "~/types";
+import { loadData, loadStudents } from "~/data";
+import { Campus, campuses, type Student } from "~/types";
 import { ClockIcon } from "../_components/ClockIcon";
 import RankingTable from "../_components/RankingTable";
 import { Box } from "../_components/Box";
 import { Minutes } from "../_components/Minutes";
 import { notFound } from "next/navigation";
+import { groupBy } from "~/array";
+import Link from "next/link";
 
 export default async function Home({
   params,
 }: {
   params: Promise<{ campus: string }>;
 }) {
-  const campus = (await params).campus.toUpperCase() as keyof typeof campuses;
+  const campus = (await params).campus.toUpperCase() as Campus;
   if (!(campus in campuses)) {
     return notFound();
   }
+
+  const { students, lastUpdate } = await loadStudents();
+
+  const campusStudents = groupBy(students, (s) => s.campus);
+
+  const campusStats = new Map(
+    [...campusStudents.entries()].map(([campus, students]) => [
+      campus,
+      {
+        campus,
+        minutes: students.reduce((a, s) => a + s.minutes, 0),
+        pledges: students.reduce((a, s) => a + s.pledgesOnline, 0),
+        raised: students.reduce((a, s) => a + s.expectedRaised, 0),
+        classes: new Set(students.map((s) => s.animal)).size, // TODO: include nonparticipating classes
+      },
+    ]),
+  );
 
   const {
     classes: campusClasses,
     topReaders,
     topPledgers,
-    lastUpdate,
   } = await loadData(campus);
-
-  const campusStudents = [...campusClasses.values()].flatMap((c) => c.students);
-  const totalMinutes = campusStudents.reduce((a, s) => a + s.minutes, 0);
-  const totalPledges = campusStudents.reduce((a, s) => a + s.pledgesOnline, 0);
-  const totalRaised = campusStudents.reduce((a, s) => a + s.expectedRaised, 0);
-  console.log(totalMinutes, totalPledges, totalRaised);
 
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
@@ -39,11 +51,36 @@ export default async function Home({
         </h1>
         <CampusSelector campus={campus} />
       </div>
-      <div className="grid w-full grid-cols-1 gap-4 md:w-auto md:grid-cols-3 md:gap-8">
-        <TopReadingClass classes={campusClasses} />
-      </div>
 
       <div className="grid w-full grid-cols-1 gap-4 md:w-auto md:grid-cols-3 md:gap-8">
+        <Box className="col-span-2">
+          <h2 className="text-xl font-bold">Campuses</h2>
+          <RankingTable
+            awards={0}
+            rows={Array.from(campusStats.entries())
+              .map(([c, stats]) => ({
+                contents: (
+                  <Link
+                    className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
+                    href={`/${c.toLowerCase()}`}
+                  >
+                    {campuses[c]}
+                  </Link>
+                ),
+                scoreCell: (
+                  <>${(stats.raised / stats.classes).toFixed(2)} per class</>
+                ),
+                pledges: stats.pledges,
+                key: c,
+                score: stats.raised / stats.classes,
+                highlight: c === campus,
+              }))
+              .sort((a, b) => b.score - a.score)}
+          />
+        </Box>
+
+        <TopReadingClass classes={campusClasses} />
+
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top readers</h2>
           {(topReaders[0]?.minutes ?? 0 > 0) ? (

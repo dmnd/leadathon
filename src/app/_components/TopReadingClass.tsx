@@ -72,7 +72,7 @@ export default function TopReadingClass({
           }));
 
         return (
-          <Box key={league}>
+          <Box key={league} className="row-span-2">
             <h2 className="text-xl font-bold">
               <GradeLabel grade={classes[0]!.grade} long /> rankings
             </h2>

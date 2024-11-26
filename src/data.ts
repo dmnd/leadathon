@@ -4,9 +4,9 @@ import path from "path";
 import invariant from "tiny-invariant";
 import { groupBy, partition } from "./array";
 import nekonames from "nekonames";
-import type { Row } from "./types";
+import type { Campus, Row } from "./types";
 import { capitalize, kebabify, pascalify } from "~/string";
-
+import { campuses } from "~/types";
 const teachers: Record<string, string> = {
   "1MonkeyCAR": "Jin Ruoxi",
   "1TigerCAR": "Zhou Jing",
@@ -123,9 +123,14 @@ export async function loadStudents() {
       return [];
     }
 
-    const [, grade, animal, campus] = match;
+    const [, grade, animal, rawCampus] = match;
 
-    invariant(campus != null);
+    invariant(rawCampus != null);
+    if (!(rawCampus in campuses)) {
+      throw new Error(`Unknown campus ${rawCampus}`);
+    }
+    const campus = rawCampus as Campus;
+
     invariant(animal != null);
     invariant(grade != null);
 
@@ -158,20 +163,19 @@ export async function loadStudents() {
       existing.pledgesOnline += s.pledgesOnline;
       existing.pledgesOffline += s.pledgesOffline;
       existing.minutes += s.minutes;
+      existing.expectedRaised += s.expectedRaised;
       existing._raw.push(...s._raw);
     } else {
       uniqStudents.set(s.id, s);
     }
   }
-  return { students: uniqStudents, lastUpdate };
+  return { students: [...uniqStudents.values()], lastUpdate };
 }
 
 export async function loadData(campus: string) {
   const { students: allStudents, lastUpdate } = await loadStudents();
 
-  const campusStudents = [...allStudents.values()].filter(
-    (s) => s.campus === campus,
-  );
+  const campusStudents = allStudents.filter((s) => s.campus === campus);
   const studentNames = campusStudents.map((s) =>
     fullName(s.firstName, s.lastName),
   );

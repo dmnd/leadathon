@@ -22,7 +22,7 @@ export type Student = {
   displayName: string;
   _raw: Array<Row>;
   id: string;
-  campus: string;
+  campus: Campus;
   animal: string;
   grade: number;
   pledgesOnline: number;
@@ -35,7 +35,7 @@ export type Class = {
   students: Array<Student>;
   className: string;
   grade: number;
-  campus: string;
+  campus: Campus;
   animal: string;
   pledges: number;
   minutes: number;
@@ -46,3 +46,5 @@ export const campuses = {
   CHE: "Chestnut",
   MLK: "MLK",
 } as const;
+
+export type Campus = keyof typeof campuses;

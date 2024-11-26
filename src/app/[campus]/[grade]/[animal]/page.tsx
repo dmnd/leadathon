@@ -6,7 +6,7 @@ import { Minutes } from "~/app/_components/Minutes";
 import RankingTable from "~/app/_components/RankingTable";
 import { className, loadData } from "~/data";
 import { humanize } from "~/string";
-import { campuses } from "~/types";
+import { Campus, campuses } from "~/types";
 import { Box } from "../../../_components/Box";
 import { notFound } from "next/navigation";
 
@@ -15,7 +15,7 @@ export default async function Animal({
 }: {
   params: Promise<{ animal: string; grade: string; campus: string }>;
 }) {
-  const campus = (await params).campus.toUpperCase() as keyof typeof campuses;
+  const campus = (await params).campus.toUpperCase() as Campus;
   if (!(campus in campuses)) {
     return notFound();
   }
