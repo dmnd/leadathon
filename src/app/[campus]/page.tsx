@@ -68,11 +68,16 @@ export default async function Home({
                   </Link>
                 ),
                 scoreCell: (
-                  <>${(stats.raised / stats.classes).toFixed(2)} per class</>
+                  <>
+                    {(stats.pledges / stats.classes)
+                      .toFixed(1)
+                      .toLocaleString()}{" "}
+                    <span className="text-sm">pledges per class</span>
+                  </>
                 ),
                 pledges: stats.pledges,
                 key: c,
-                score: stats.raised / stats.classes,
+                score: stats.pledges / stats.classes,
                 highlight: c === campus,
               }))
               .sort((a, b) => b.score - a.score)}
