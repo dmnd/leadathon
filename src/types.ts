@@ -28,6 +28,7 @@ export type Student = {
   pledgesOnline: number;
   pledgesOffline: number;
   minutes: number;
+  expectedRaised: number;
 };
 
 export type Class = {

@@ -104,7 +104,7 @@ function fullName(firstName: string, lastName: string) {
   return lastName.length > 0 ? `${firstName} ${lastName}` : firstName;
 }
 
-export async function loadData(campus: string) {
+export async function loadStudents() {
   const [csv, lastUpdate] = await parseCSV();
 
   const [badClasses, rawStudents] = partition(
@@ -137,7 +137,6 @@ export async function loadData(campus: string) {
         id: [campus, grade, animal, lastName, firstName].join("|"),
         firstName,
         lastName,
-        displayName: fullName(firstName, lastName),
         _raw: [s],
         campus,
         animal: kebabify(animal),
@@ -146,6 +145,7 @@ export async function loadData(campus: string) {
           s["Online Donation #"] + s["Potential Online Donation #"],
         pledgesOffline: 0, // TODO
         minutes: s["Minute Count"],
+        expectedRaised: s["Total + Potential"],
       },
     ];
   });
@@ -163,28 +163,37 @@ export async function loadData(campus: string) {
       uniqStudents.set(s.id, s);
     }
   }
+  return { students: uniqStudents, lastUpdate };
+}
 
-  const campusStudents = Array.from(uniqStudents.values()).filter(
+export async function loadData(campus: string) {
+  const { students: allStudents, lastUpdate } = await loadStudents();
+
+  const campusStudents = [...allStudents.values()].filter(
     (s) => s.campus === campus,
   );
-  const studentNames = campusStudents.map((s) => s.displayName);
+  const studentNames = campusStudents.map((s) =>
+    fullName(s.firstName, s.lastName),
+  );
   const displayNames = nekonames(studentNames);
-  for (const [, s] of campusStudents.entries()) {
-    s.displayName =
-      displayNames[fullName(s.firstName, s.lastName)] ?? s.displayName;
-  }
+  const students = campusStudents.map((s) => ({
+    ...s,
+    displayName:
+      displayNames[fullName(s.firstName, s.lastName)] ??
+      fullName(s.firstName, s.lastName),
+  }));
 
-  const topReaders = campusStudents
+  const topReaders = students
     .sort((a, b) => b.minutes - a.minutes || b.pledgesOnline - a.pledgesOnline)
     .slice(0, 10);
 
-  const topPledgers = campusStudents
+  const topPledgers = students
     .sort((a, b) => b.pledgesOnline - a.pledgesOnline || b.minutes - a.minutes)
     .slice(0, 10);
 
   const classes = new Map(
     Array.from(
-      groupBy(uniqStudents.values(), className).entries(),
+      groupBy(students.values(), className).entries(),
       ([className, students]) => {
         const teacher = teachers[className];
         if (teacher == null) {

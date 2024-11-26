@@ -25,6 +25,12 @@ export default async function Home({
     lastUpdate,
   } = await loadData(campus);
 
+  const campusStudents = [...campusClasses.values()].flatMap((c) => c.students);
+  const totalMinutes = campusStudents.reduce((a, s) => a + s.minutes, 0);
+  const totalPledges = campusStudents.reduce((a, s) => a + s.pledgesOnline, 0);
+  const totalRaised = campusStudents.reduce((a, s) => a + s.expectedRaised, 0);
+  console.log(totalMinutes, totalPledges, totalRaised);
+
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
       <div className="flex items-center gap-4">
