@@ -9,6 +9,18 @@ import { Minutes } from "../_components/Minutes";
 import { notFound } from "next/navigation";
 import { groupBy } from "~/array";
 import Link from "next/link";
+import { GradeLabel } from "../_components/GradeLabel";
+
+function Student({ student }: { student: Student }) {
+  return (
+    <>
+      {student.displayName}{" "}
+      <span className="ml-1 text-xs text-white/50">
+        <GradeLabel grade={student.grade} />
+      </span>
+    </>
+  );
+}
 
 export default async function Home({
   params,
@@ -91,7 +103,7 @@ export default async function Home({
           {(topReaders[0]?.minutes ?? 0 > 0) ? (
             <RankingTable
               rows={topReaders.map((s) => ({
-                contents: s.displayName,
+                contents: <Student student={s} />,
                 scoreCell: (
                   <>
                     <ClockIcon /> <Minutes minutes={s.minutes} />
@@ -113,7 +125,7 @@ export default async function Home({
           {(topPledgers[0]?.pledgesOnline ?? 0 > 0) ? (
             <RankingTable
               rows={topPledgers.map((s) => ({
-                contents: s.displayName,
+                contents: <Student student={s} />,
                 scoreCell: (
                   <>
                     {s.pledgesOnline.toLocaleString()}{" "}
