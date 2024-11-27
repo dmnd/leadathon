@@ -74,7 +74,7 @@ export default function RankingTable({
             <td
               className={`text-right tabular-nums ${r.highlight ? highlightStyles : ""} ${showPledges ? "" : "rounded-r-md"}`}
             >
-              {r.scoreCell}
+              {r.score > 0 ? r.scoreCell : "-"}
             </td>
             {showPledges ? (
               <td
