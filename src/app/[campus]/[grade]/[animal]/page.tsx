@@ -100,7 +100,7 @@ export default async function Animal({
 
         <Box>
           <h2 className="text-xl font-bold">
-            Ranked #{position} in <GradeLabel grade={grade} /> grade
+            Ranked #{position} in <GradeLabel grade={grade} long />
           </h2>
           <GradeRankingTable viewer={classroomName} classes={gradeClasses} />
         </Box>
