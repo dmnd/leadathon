@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Readathon 2024! at Yu Ming Charter School",
@@ -25,6 +26,7 @@ export default function RootLayout({
         <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#ac211d] to-[#15162c] text-white">
           {children}
           <Analytics />
+          <SpeedInsights />
           <a
             href="https://github.com/dmnd/leadathon"
             target="_blank"
