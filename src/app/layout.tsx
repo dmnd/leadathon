@@ -3,6 +3,8 @@ import "~/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
+import { Analytics } from "@vercel/analytics/react";
+
 export const metadata: Metadata = {
   title: "Readathon 2024! at Yu Ming Charter School",
   description: "Read, pledge and win!",
@@ -22,6 +24,7 @@ export default function RootLayout({
       <body>
         <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#ac211d] to-[#15162c] text-white">
           {children}
+          <Analytics />
           <a
             href="https://github.com/dmnd/leadathon"
             target="_blank"
