@@ -162,59 +162,63 @@ export default async function Home({
 
           {/* Race lanes */}
           <div className="flex flex-col gap-2">
-            {Array.from(campusClasses.values()).map((classroom) => {
-              const pledges = classroom.students.reduce(
-                (acc, s) => acc + s.pledgesOnline,
-                0,
-              );
+            {Array.from(campusClasses.values())
+              .sort(
+                (a, b) => a.grade - b.grade || a.animal.localeCompare(b.animal),
+              )
+              .map((classroom) => {
+                const pledges = classroom.students.reduce(
+                  (acc, s) => acc + s.pledgesOnline,
+                  0,
+                );
 
-              const progress = Math.min(100, (pledges / 80) * 100);
+                const progress = Math.min(100, (pledges / 80) * 100);
 
-              return (
-                <div key={classroom.animal} className="relative h-8">
-                  {/* Lane background */}
-                  <div className="absolute h-full w-full rounded bg-white/5" />
+                return (
+                  <div key={classroom.animal} className="relative h-8">
+                    {/* Lane background */}
+                    <div className="absolute h-full w-full rounded bg-white/5" />
 
-                  {/* Progress bar */}
-                  <div
-                    className="absolute h-full bg-yellow-300/40"
-                    style={{
-                      width: `${progress}%`,
-                      borderRadius: "20px 50px 50px 20px",
-                    }}
-                  />
+                    {/* Progress bar */}
+                    <div
+                      className="absolute h-full bg-yellow-300/40"
+                      style={{
+                        width: `${progress}%`,
+                        borderRadius: "20px 50px 50px 20px",
+                      }}
+                    />
 
-                  {/* Class "runner" */}
-                  <div
-                    className="absolute h-6 w-6 rounded-full bg-yellow-300 text-center shadow-lg"
-                    style={{
-                      left: `${progress}%`,
-                      top: "4px",
-                      transform: "translateX(-100%) translateX(-4px)",
-                      mixBlendMode: "screen",
-                      color: "black",
-                    }}
-                  >
-                    <span className="text-sm font-bold">
-                      {classroom.pledges}
-                    </span>
+                    {/* Class "runner" */}
+                    <div
+                      className="absolute h-6 w-6 rounded-full bg-yellow-300 text-center shadow-lg"
+                      style={{
+                        left: `${progress}%`,
+                        top: "4px",
+                        transform: "translateX(-100%) translateX(-4px)",
+                        mixBlendMode: "screen",
+                        color: "black",
+                      }}
+                    >
+                      <span className="text-sm font-bold">
+                        {classroom.pledges}
+                      </span>
+                    </div>
+
+                    {/* Labels */}
+                    {progress > 10 ? (
+                      <div className="absolute left-2 top-1/2 -translate-y-1/2 text-lg font-bold uppercase text-white/40">
+                        {humanize(classroom.animal)}
+                      </div>
+                    ) : null}
+
+                    {progress < 90 ? (
+                      <div className="absolute right-7 top-1/2 -translate-y-1/2 text-lg font-bold uppercase text-white/40">
+                        {humanize(classroom.animal)}
+                      </div>
+                    ) : null}
                   </div>
-
-                  {/* Labels */}
-                  {progress > 10 ? (
-                    <div className="absolute left-2 top-1/2 -translate-y-1/2 text-lg font-bold uppercase text-white/40">
-                      {humanize(classroom.animal)}
-                    </div>
-                  ) : null}
-
-                  {progress < 90 ? (
-                    <div className="absolute right-7 top-1/2 -translate-y-1/2 text-lg font-bold uppercase text-white/40">
-                      {humanize(classroom.animal)}
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
       </div>
