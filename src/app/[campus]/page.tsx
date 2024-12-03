@@ -1,13 +1,14 @@
 import CampusSelector from "~/app/_components/CampusSelector";
 import TopReadingClass from "~/app/_components/TopReadingClass";
 import { loadData, loadStudents } from "~/data";
-import { Campus, campuses, type Student } from "~/types";
+import { type Campus, campuses, type Student } from "~/types";
 import { ClockIcon } from "../_components/ClockIcon";
 import RankingTable from "../_components/RankingTable";
 import { Box } from "../_components/Box";
 import { Minutes } from "../_components/Minutes";
 import { notFound } from "next/navigation";
 import { groupBy } from "~/array";
+import { humanize } from "~/string";
 import Link from "next/link";
 import { GradeLabel } from "../_components/GradeLabel";
 
@@ -142,6 +143,80 @@ export default async function Home({
             <span className="text-white/70">None yet. Go get pledges!</span>
           )}
         </Box>
+      </div>
+
+      <div className="w-full max-w-4xl">
+        <h2 className="mb-4 text-xl font-bold">Race for 80 pledges</h2>
+        <div className="relative">
+          {/* Finish line with checker pattern */}
+          <div
+            className="absolute right-0 top-0 h-full w-6 overflow-hidden"
+            style={{
+              width: "20px",
+              backgroundPosition: "0px 0px, 10px 10px",
+              backgroundSize: "20px 20px",
+              backgroundImage: `linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000 100%),
+                                  linear-gradient(45deg, #000 25%, white 25%, white 75%, #000 75%, #000 100%)`,
+            }}
+          ></div>
+
+          {/* Race lanes */}
+          <div className="flex flex-col gap-2">
+            {Array.from(campusClasses.values()).map((classroom) => {
+              const pledges = classroom.students.reduce(
+                (acc, s) => acc + s.pledgesOnline,
+                0,
+              );
+
+              const progress = Math.min(100, (pledges / 80) * 100);
+
+              return (
+                <div key={classroom.animal} className="relative h-8">
+                  {/* Lane background */}
+                  <div className="absolute h-full w-full rounded bg-white/5" />
+
+                  {/* Progress bar */}
+                  <div
+                    className="absolute h-full bg-yellow-300/40"
+                    style={{
+                      width: `${progress}%`,
+                      borderRadius: "20px 50px 50px 20px",
+                    }}
+                  />
+
+                  {/* Class "runner" */}
+                  <div
+                    className="absolute h-6 w-6 rounded-full bg-yellow-300 text-center shadow-lg"
+                    style={{
+                      left: `${progress}%`,
+                      top: "4px",
+                      transform: "translateX(-100%) translateX(-4px)",
+                      mixBlendMode: "screen",
+                      color: "black",
+                    }}
+                  >
+                    <span className="text-sm font-bold">
+                      {classroom.pledges}
+                    </span>
+                  </div>
+
+                  {/* Labels */}
+                  {progress > 10 ? (
+                    <div className="absolute left-2 top-1/2 -translate-y-1/2 text-lg font-bold uppercase text-white/40">
+                      {humanize(classroom.animal)}
+                    </div>
+                  ) : null}
+
+                  {progress < 90 ? (
+                    <div className="absolute right-7 top-1/2 -translate-y-1/2 text-lg font-bold uppercase text-white/40">
+                      {humanize(classroom.animal)}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="text-sm text-white/50">
