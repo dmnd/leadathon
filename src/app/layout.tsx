@@ -32,6 +32,7 @@ export default function RootLayout({
             target="_blank"
             rel="noopener noreferrer"
             className="absolute right-4 top-4 text-white/50 transition-colors hover:text-white/90"
+            aria-label="Hack this site on GitHub"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
