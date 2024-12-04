@@ -85,7 +85,7 @@ export default function RankingTable({
               className={clsx(
                 "text-right tabular-nums",
                 r.highlight && highlightStyles,
-                !showPledges && "rounded-r-md",
+                !showPledges && "rounded-r-md pr-2",
               )}
             >
               {r.score > 0 ? (
