@@ -55,6 +55,7 @@ export default function TopReadingClass({
             (a, b) =>
               b.pledgesOnline - a.pledgesOnline || b.minutes - a.minutes,
           )
+          .filter((s) => s.pledgesOnline > 0)
           .slice(0, 3)
           .map((s) => ({
             key: s.id,
