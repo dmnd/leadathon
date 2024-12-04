@@ -18,8 +18,8 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "encrypt-csv": "for f in src/*.csv; do openssl enc -aes-256-cbc -pbkdf2 -iter 600000 -salt -in \"$f\" -out \"$f.enc\" -pass env:CSV_PASSWORD; done",
-    "decrypt-csv": "for f in src/*.csv.enc; do openssl enc -aes-256-cbc -pbkdf2 -iter 600000 -salt -d -in \"$f\" -out \"${f%.enc}\" -pass env:CSV_PASSWORD; done"
+    "encrypt-csv": "for f in src/*.csv; do openssl enc -aes-256-cbc -pbkdf2 -iter 600000 -nosalt -in \"$f\" -out \"$f.enc\" -pass env:CSV_PASSWORD; done",
+    "decrypt-csv": "for f in src/*.csv.enc; do openssl enc -aes-256-cbc -pbkdf2 -iter 600000 -nosalt -d -in \"$f\" -out \"${f%.enc}\" -pass env:CSV_PASSWORD; done"
   },
   "dependencies": {
     "@libsql/client": "^0.9.0",
