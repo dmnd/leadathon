@@ -2,11 +2,13 @@ import Link from "next/link";
 
 export default function PledgestarTippy({
   initial = null,
+  ref,
 }: {
   initial?: React.ReactNode;
+  ref?: React.RefObject<HTMLDivElement>;
 }) {
   return (
-    <div className="flex flex-col items-start gap-2 p-2 text-left">
+    <div className="flex flex-col items-start gap-2 p-2 text-left" ref={ref}>
       {initial}
       <div>
         Log your reading on Pledgestar to be included in the next update!
