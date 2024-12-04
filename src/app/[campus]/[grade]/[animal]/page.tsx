@@ -33,12 +33,20 @@ export default async function Animal({
   }
 
   const students = classroom.students.sort(
-    (a, b) => b.minutes - a.minutes || b.pledgesOnline - a.pledgesOnline,
+    (a, b) =>
+      b.minutes - a.minutes ||
+      b.pledgesOnline - a.pledgesOnline ||
+      a.displayName.localeCompare(b.displayName),
   );
 
   const gradeClasses = [...classes.values()]
     .filter((c) => c.grade === classroom.grade)
-    .sort((a, b) => b.minutes - a.minutes || b.pledges - a.pledges);
+    .sort(
+      (a, b) =>
+        b.minutes - a.minutes ||
+        b.pledges - a.pledges ||
+        a.animal.localeCompare(b.animal),
+    );
   const position = gradeClasses.findIndex((c) => c === classroom) + 1;
 
   const classPledges = students.reduce((acc, s) => acc + s.pledgesOnline, 0);

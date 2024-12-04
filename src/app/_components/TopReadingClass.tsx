@@ -23,7 +23,12 @@ export default function TopReadingClass({
       league,
       classes
         .slice()
-        .sort((a, b) => b.minutes - a.minutes || b.pledges - a.pledges),
+        .sort(
+          (a, b) =>
+            b.minutes - a.minutes ||
+            b.pledges - a.pledges ||
+            a.animal.localeCompare(b.animal),
+        ),
     ]),
   );
 
@@ -34,7 +39,9 @@ export default function TopReadingClass({
           .flatMap((c) => c.students)
           .sort(
             (a, b) =>
-              b.minutes - a.minutes || b.pledgesOnline - a.pledgesOnline,
+              b.minutes - a.minutes ||
+              b.pledgesOnline - a.pledgesOnline ||
+              a.displayName.localeCompare(b.displayName),
           )
           .slice(0, 5)
           .map((s) => ({
@@ -53,7 +60,9 @@ export default function TopReadingClass({
           .flatMap((c) => c.students)
           .sort(
             (a, b) =>
-              b.pledgesOnline - a.pledgesOnline || b.minutes - a.minutes,
+              b.pledgesOnline - a.pledgesOnline ||
+              b.minutes - a.minutes ||
+              a.displayName.localeCompare(b.displayName),
           )
           .filter((s) => s.pledgesOnline > 0)
           .slice(0, 3)

@@ -94,7 +94,7 @@ export default async function Home({
                 score: stats.pledges / stats.classes,
                 highlight: c === campus,
               }))
-              .sort((a, b) => b.score - a.score)}
+              .sort((a, b) => b.score - a.score || a.key.localeCompare(b.key))}
           />
         </Box>
 

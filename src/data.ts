@@ -188,11 +188,21 @@ export async function loadData(campus: string) {
   }));
 
   const topReaders = students
-    .sort((a, b) => b.minutes - a.minutes || b.pledgesOnline - a.pledgesOnline)
+    .sort(
+      (a, b) =>
+        b.minutes - a.minutes ||
+        b.pledgesOnline - a.pledgesOnline ||
+        b.displayName.localeCompare(a.displayName),
+    )
     .slice(0, 10);
 
   const topPledgers = students
-    .sort((a, b) => b.pledgesOnline - a.pledgesOnline || b.minutes - a.minutes)
+    .sort(
+      (a, b) =>
+        b.pledgesOnline - a.pledgesOnline ||
+        b.minutes - a.minutes ||
+        b.displayName.localeCompare(a.displayName),
+    )
     .slice(0, 10);
 
   const classes = new Map(
