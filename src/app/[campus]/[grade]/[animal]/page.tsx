@@ -9,6 +9,7 @@ import { humanize } from "~/string";
 import { Campus, campuses } from "~/types";
 import { Box } from "../../../_components/Box";
 import { notFound } from "next/navigation";
+import Footer from "~/app/_components/Footer";
 
 export default async function Animal({
   params,
@@ -131,9 +132,7 @@ export default async function Animal({
         </Box>
       </div>
 
-      <div className="text-sm text-white/50">
-        Data updated {lastUpdate.toLocaleString()}
-      </div>
+      <Footer lastUpdate={lastUpdate} />
     </div>
   );
 }

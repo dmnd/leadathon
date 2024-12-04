@@ -11,6 +11,7 @@ import { groupBy } from "~/array";
 import { humanize } from "~/string";
 import Link from "next/link";
 import { GradeLabel } from "../_components/GradeLabel";
+import Footer from "../_components/Footer";
 
 function Student({ student }: { student: Student }) {
   return (
@@ -223,9 +224,7 @@ export default async function Home({
         </div>
       </div>
 
-      <div className="text-sm text-white/50">
-        Data updated {lastUpdate.toLocaleString()}
-      </div>
+      <Footer lastUpdate={lastUpdate} />
     </div>
   );
 }
