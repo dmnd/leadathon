@@ -13,9 +13,15 @@ export default function CampusSelector({ campus }: { campus: string }) {
         router.push(`/${e.target.value.toLowerCase()}`);
       }}
     >
-      <option value="CAR">{campuses.CAR}</option>
-      <option value="CHE">{campuses.CHE}</option>
-      <option value="MLK">{campuses.MLK}</option>
+      <option className="text-black" value="CAR">
+        {campuses.CAR}
+      </option>
+      <option className="text-black" value="CHE">
+        {campuses.CHE}
+      </option>
+      <option className="text-black" value="MLK">
+        {campuses.MLK}
+      </option>
     </select>
   );
 }
