@@ -54,14 +54,16 @@ export function className(x: {
   return `${x.grade === 0 ? "K" : x.grade}${pascalify(x.animal)}${x.campus.toUpperCase()}`;
 }
 
+const regex = new RegExp(/^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)(\d\d)\.csv$/);
+
 async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
   const files = fs
     .readdirSync(path.join(process.cwd(), "src"))
-    .filter((f) => f.endsWith(".csv"))
+    .filter((f) => regex.exec(f))
     .sort();
   const fileName = files.pop()!;
   const filePath = `./src/${fileName}`;
-  const match = /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)(\d\d)\.csv$/.exec(fileName);
+  const match = regex.exec(fileName);
   if (!match) {
     throw new Error(`Failed to parse date from ${fileName}`);
   }
@@ -87,6 +89,57 @@ async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
   });
 }
 
+function cleanupClassName(s: string) {
+  return s
+    .replace(
+      /[A-Z]$/,
+      (c) =>
+        ({
+          A: "CHE",
+          M: "MLK",
+          C: "CAR",
+        })[c]!,
+    )
+    .replace("4SeaTurtlMLK", "4SeaTurtleMLK");
+}
+
+function rosterName(first: string, last: string) {
+  return `${first.toLowerCase()}|${last.toLowerCase()}`;
+}
+
+function parseRoster(): Promise<Map<string, Set<string>>> {
+  const file = fs.readFileSync(
+    path.join(process.cwd(), "./src/2024-roster.csv"),
+    "utf8",
+  );
+
+  type RosterRow = {
+    First: string;
+    Last: string;
+    GR: string;
+    Class: string;
+  };
+
+  return new Promise((resolve, reject) => {
+    Papa.parse<RosterRow>(file, {
+      header: true,
+      dynamicTyping: true,
+      error: reject,
+      complete: (results) => {
+        const map = new Map<string, Set<string>>();
+        for (const r of results.data) {
+          if (r.First == null) continue;
+          const key = rosterName(r.First, r.Last);
+          const set = map.get(key) ?? new Set();
+          set.add(cleanupClassName(r.Class));
+          map.set(key, set);
+        }
+        resolve(map);
+      },
+    });
+  });
+}
+
 function isMixedCase(s: string) {
   return s.toLocaleUpperCase() !== s && s.toLocaleLowerCase() !== s;
 }
@@ -96,7 +149,7 @@ function cleanupName(s: string) {
   if (isMixedCase(s)) return s;
 
   const s2 = capitalize(s.toLocaleLowerCase());
-  console.log(`cleaned up name ${s} to ${s2}`);
+  // console.info(`Cleaned up name ${s} to ${s2}`);
   return s2;
 }
 
@@ -105,7 +158,10 @@ function fullName(firstName: string, lastName: string) {
 }
 
 export async function loadStudents() {
-  const [csv, lastUpdate] = await parseCSV();
+  const [roster, [csv, lastUpdate]] = await Promise.all([
+    parseRoster(),
+    parseCSV(),
+  ]);
 
   const [badClasses, rawStudents] = partition(
     csv.data,
@@ -117,13 +173,50 @@ export async function loadStudents() {
   );
 
   const students = rawStudents.flatMap((s) => {
-    const match = /^(\w)(\w+)(\w{3}).*$/.exec(s["Class Name"]);
+    const firstName = cleanupName(s["First Name"]);
+    const lastName = cleanupName(s["Last Name"]);
+
+    const pledgestarClass = s["Class Name"]?.split(/[\s,]+/)[0] ?? "";
+    const rosterClasses =
+      roster.get(rosterName(firstName, lastName)) ?? new Set();
+
+    let classroom = pledgestarClass;
+    let movedFrom: string | null = null;
+    if (rosterClasses.size === 0) {
+      // console.warn(`${rosterName(firstName, lastName)} not found in roster`);
+      // TODO: investigate these
+    } else if (rosterClasses.size > 1) {
+      // There are kids with the same name!
+      console.info(
+        `Multiple roster classes found for ${firstName} ${lastName}, skipping autofix`,
+      );
+    } else {
+      const rosterClass = [...rosterClasses.values()][0]!;
+
+      if (rosterClass !== pledgestarClass) {
+        // autofix kids that selected the wrong campus or animal on pledgestar,
+        // but don't move between grades!
+        if (rosterClass.slice(0, 1) === pledgestarClass.slice(0, 1)) {
+          console.warn(
+            `Moved ${firstName} ${lastName} from Pledgestar class ${pledgestarClass} to rostered class ${rosterClass}`,
+          );
+          movedFrom = pledgestarClass;
+          classroom = rosterClass;
+        } else {
+          console.info(
+            `Possible Pledgestar data issue for ${firstName} ${lastName}: pledgestar class '${pledgestarClass}' but roster class '${rosterClass}'`,
+          );
+        }
+      }
+    }
+
+    const match = /^(\w)(\w+)(\w{3}).*$/.exec(classroom);
     if (!match) {
       console.error("Failed to match", s["Class Name"]);
       return [];
     }
 
-    const [, grade, animal, rawCampus] = match;
+    const [, rawGrade, animal, rawCampus] = match;
 
     invariant(rawCampus != null);
     if (!(rawCampus in campuses)) {
@@ -132,20 +225,19 @@ export async function loadStudents() {
     const campus = rawCampus as Campus;
 
     invariant(animal != null);
-    invariant(grade != null);
-
-    const firstName = cleanupName(s["First Name"]);
-    const lastName = cleanupName(s["Last Name"]);
+    invariant(rawGrade != null);
+    const grade = rawGrade === "K" ? 0 : Number.parseInt(rawGrade);
 
     return [
       {
-        id: [campus, grade, animal, lastName, firstName].join("|"),
+        id: [campus, rawGrade, animal, lastName, firstName].join("|"),
         firstName,
         lastName,
         _raw: [s],
         campus,
         animal: kebabify(animal),
-        grade: grade === "K" ? 0 : Number.parseInt(grade),
+        grade,
+        movedFrom,
         pledgesOnline:
           s["Online Donation #"] + s["Potential Online Donation #"],
         pledgesOffline: 0, // TODO
