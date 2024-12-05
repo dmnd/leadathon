@@ -6,8 +6,7 @@ import PledgestarTippy from "./PledgestarTippy";
 export default function Footer({ lastUpdate }: { lastUpdate: Date }) {
   return (
     <div className="pt-5 text-sm text-white/50">
-      Pledgestar data last updated{" "}
-      {lastUpdate.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })}.{" "}
+      Pledgestar data last updated {lastUpdate.toISOString()}.{" "}
       <Tippy
         content={<PledgestarTippy />}
         delay={0}
