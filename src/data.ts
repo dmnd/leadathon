@@ -7,6 +7,8 @@ import nekonames from "nekonames";
 import type { Campus, Row } from "./types";
 import { capitalize, kebabify, pascalify } from "~/string";
 import { campuses } from "~/types";
+import { DateTime } from "luxon";
+
 const teachers: Record<string, string> = {
   "1MonkeyCAR": "Jin Ruoxi",
   "1TigerCAR": "Zhou Jing",
@@ -56,7 +58,7 @@ export function className(x: {
 
 const regex = new RegExp(/^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)(\d\d)\.csv$/);
 
-async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
+async function parseCSV(): Promise<[Papa.ParseResult<Row>, string]> {
   const files = fs
     .readdirSync(path.join(process.cwd(), "src"))
     .filter((f) => regex.exec(f))
@@ -69,13 +71,16 @@ async function parseCSV(): Promise<[Papa.ParseResult<Row>, Date]> {
   }
   const [, year, month, day, hour, minute] = match;
 
-  const lastUpdate = new Date(
+  const lastUpdate = DateTime.utc(
     Number(year),
-    Number(month) - 1,
+    Number(month),
     Number(day),
     Number(hour),
     Number(minute),
-  );
+  )
+    .setZone("America/Los_Angeles", { keepLocalTime: true })
+    .toLocaleString(DateTime.DATETIME_SHORT);
+
   const file = fs.readFileSync(filePath, "utf8");
   return new Promise((resolve, reject) => {
     Papa.parse<Row>(file, {

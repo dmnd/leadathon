@@ -3,10 +3,10 @@
 import Tippy from "./Tippy";
 import PledgestarTippy from "./PledgestarTippy";
 
-export default function Footer({ lastUpdate }: { lastUpdate: Date }) {
+export default function Footer({ lastUpdate }: { lastUpdate: string }) {
   return (
     <div className="pt-5 text-sm text-white/50">
-      Pledgestar data last updated {lastUpdate.toISOString()}.{" "}
+      Pledgestar data last updated {lastUpdate}.{" "}
       <Tippy
         content={<PledgestarTippy />}
         delay={0}
