@@ -133,6 +133,7 @@ export default async function Animal({
                 score: s.minutes,
               }))}
               awards={3}
+              targetRows={students.length}
             />
           ) : (
             <span className="text-white/70">None yet. Log your reading!</span>

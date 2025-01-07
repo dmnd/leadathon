@@ -71,6 +71,7 @@ export default async function Home({
           <h2 className="text-xl font-bold">Campuses</h2>
           <RankingTable
             awards={0}
+            targetRows={campusStats.size}
             rows={Array.from(campusStats.entries())
               .map(([c, stats]) => ({
                 contents: (
@@ -116,6 +117,7 @@ export default async function Home({
                 score: s.minutes,
               }))}
               awards={10}
+              targetRows={10}
             />
           ) : (
             <span className="text-white/70">Nobody yet. Log your reading!</span>
@@ -139,6 +141,7 @@ export default async function Home({
                 score: s.pledgesOnline,
               }))}
               awards={5}
+              targetRows={10}
             />
           ) : (
             <span className="text-white/70">None yet. Go get pledges!</span>

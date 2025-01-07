@@ -43,7 +43,6 @@ export default function TopReadingClass({
               b.pledgesOnline - a.pledgesOnline ||
               a.displayName.localeCompare(b.displayName),
           )
-          .slice(0, 5)
           .map((s) => ({
             key: s.id,
             contents: s.displayName,
@@ -65,7 +64,6 @@ export default function TopReadingClass({
               a.displayName.localeCompare(b.displayName),
           )
           .filter((s) => s.pledgesOnline > 0)
-          .slice(0, 3)
           .map((s) => ({
             key: s.id,
             contents: s.displayName,
@@ -90,7 +88,7 @@ export default function TopReadingClass({
 
             <h2 className="text-xl font-bold">Top readers</h2>
             {(topReaders[0]?.score ?? 0 > 0) ? (
-              <RankingTable rows={topReaders} awards={5} />
+              <RankingTable rows={topReaders} awards={5} targetRows={5} />
             ) : (
               <span className="text-white/70">
                 Nobody yet. Log your reading!
@@ -99,7 +97,7 @@ export default function TopReadingClass({
 
             <h2 className="text-xl font-bold">Top pledgers</h2>
             {(topPledgers[0]?.score ?? 0 > 0) ? (
-              <RankingTable rows={topPledgers} awards={3} />
+              <RankingTable rows={topPledgers} awards={3} targetRows={3} />
             ) : (
               <span className="text-white/70">Nobody has pledges yet!</span>
             )}

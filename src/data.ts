@@ -285,22 +285,22 @@ export async function loadData(campus: string) {
   }));
 
   const topReaders = students
+    .slice()
     .sort(
       (a, b) =>
         b.minutes - a.minutes ||
         b.pledgesOnline - a.pledgesOnline ||
         b.displayName.localeCompare(a.displayName),
-    )
-    .slice(0, 10);
+    );
 
   const topPledgers = students
+    .slice()
     .sort(
       (a, b) =>
         b.pledgesOnline - a.pledgesOnline ||
         b.minutes - a.minutes ||
         b.displayName.localeCompare(a.displayName),
-    )
-    .slice(0, 10);
+    );
 
   const classes = new Map(
     Array.from(

@@ -42,6 +42,7 @@ export default function GradeRankingTable({
         highlight: c.className === viewer,
       }))}
       awards={1}
+      targetRows={classes.length}
     />
   );
 }

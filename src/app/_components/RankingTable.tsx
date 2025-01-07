@@ -13,6 +13,7 @@ export default function RankingTable({
   rows,
   showPledges = false,
   awards,
+  targetRows,
 }: {
   rows: Array<{
     contents: React.ReactNode;
@@ -24,6 +25,7 @@ export default function RankingTable({
   }>;
   showPledges?: boolean;
   awards: number;
+  targetRows: number;
 }) {
   const rows2: Array<[number, (typeof rows)[0]]> = [];
   let rank = 1;
@@ -34,10 +36,15 @@ export default function RankingTable({
       rank = rank + equalRank;
       equalRank = 1;
       lastScore = r.score;
+      if (rows2.length >= targetRows) {
+        break;
+      } else {
+        rows2.push([rank, r]);
+      }
     } else {
       equalRank = equalRank + 1;
+      rows2.push([rank, r]);
     }
-    rows2.push([rank, r]);
   }
 
   const maxPledges = Math.max(...rows.map((c) => c.pledges));
