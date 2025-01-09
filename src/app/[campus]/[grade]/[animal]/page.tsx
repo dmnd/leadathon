@@ -6,7 +6,7 @@ import { Minutes } from "~/app/_components/Minutes";
 import RankingTable from "~/app/_components/RankingTable";
 import { className, loadData } from "~/data";
 import { humanize } from "~/string";
-import { Campus, campuses } from "~/types";
+import { type Campus, campuses } from "~/types";
 import { Box } from "../../../_components/Box";
 import { notFound } from "next/navigation";
 import Footer from "~/app/_components/Footer";
