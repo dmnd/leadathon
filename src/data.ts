@@ -146,7 +146,7 @@ function parseRoster(): Promise<Map<string, Set<string>>> {
 }
 
 type OfflinePledgesRow = {
-  pledges: number;
+  offlinePledges: number;
   firstName: string;
   lastName: string;
   class: string;
@@ -241,9 +241,6 @@ export async function loadStudents() {
     }
 
     // add offline pledges
-    if (lastName === "Ramirez") {
-      console.error("dmndhere");
-    }
     const offlinePledge = offlinePledges.find(
       (p) =>
         p.firstName === firstName &&
@@ -271,7 +268,7 @@ export async function loadStudents() {
 
     const pledgesOnline =
       s["Online Donation #"] + s["Potential Online Donation #"];
-    const pledgesOffline = offlinePledge?.pledges ?? 0;
+    const pledgesOffline = offlinePledge?.offlinePledges ?? 0;
 
     return [
       {
