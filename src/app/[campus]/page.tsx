@@ -44,7 +44,7 @@ export default async function Home({
       {
         campus,
         minutes: students.reduce((a, s) => a + s.minutes, 0),
-        pledges: students.reduce((a, s) => a + s.pledgesOnline, 0),
+        pledges: students.reduce((a, s) => a + s.pledges, 0),
         raised: students.reduce((a, s) => a + s.expectedRaised, 0),
         classes: new Set(students.map((s) => s.animal)).size, // TODO: include nonparticipating classes
       },
@@ -112,7 +112,7 @@ export default async function Home({
                     <ClockIcon /> <Minutes minutes={s.minutes} />
                   </>
                 ),
-                pledges: s.pledgesOnline,
+                pledges: s.pledges,
                 key: s.id,
                 score: s.minutes,
               }))}
@@ -126,19 +126,19 @@ export default async function Home({
 
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top pledgers</h2>
-          {(topPledgers[0]?.pledgesOnline ?? 0 > 0) ? (
+          {(topPledgers[0]?.pledges ?? 0 > 0) ? (
             <RankingTable
               rows={topPledgers.map((s) => ({
                 contents: <Student student={s} />,
                 scoreCell: (
                   <>
-                    {s.pledgesOnline.toLocaleString()}{" "}
+                    {s.pledges.toLocaleString()}{" "}
                     <span className="text-sm">pledges</span>
                   </>
                 ),
-                pledges: s.pledgesOnline,
+                pledges: s.pledges,
                 key: s.id,
-                score: s.pledgesOnline,
+                score: s.pledges,
               }))}
               awards={5}
               targetRows={10}
@@ -172,7 +172,7 @@ export default async function Home({
               )
               .map((classroom) => {
                 const pledges = classroom.students.reduce(
-                  (acc, s) => acc + s.pledgesOnline,
+                  (acc, s) => acc + s.pledges,
                   0,
                 );
 

@@ -40,7 +40,7 @@ export default function TopReadingClass({
           .sort(
             (a, b) =>
               b.minutes - a.minutes ||
-              b.pledgesOnline - a.pledgesOnline ||
+              b.pledges - a.pledges ||
               a.displayName.localeCompare(b.displayName),
           )
           .map((s) => ({
@@ -51,7 +51,7 @@ export default function TopReadingClass({
                 <ClockIcon /> <Minutes minutes={s.minutes} />
               </>
             ),
-            pledges: s.pledgesOnline,
+            pledges: s.pledges,
             score: s.minutes,
           }));
 
@@ -59,24 +59,24 @@ export default function TopReadingClass({
           .flatMap((c) => c.students)
           .sort(
             (a, b) =>
-              b.pledgesOnline - a.pledgesOnline ||
+              b.pledges - a.pledges ||
               b.minutes - a.minutes ||
               a.displayName.localeCompare(b.displayName),
           )
-          .filter((s) => s.pledgesOnline > 0)
+          .filter((s) => s.pledges > 0)
           .map((s) => ({
             key: s.id,
             contents: s.displayName,
             scoreCell: (
               <>
-                {s.pledgesOnline.toLocaleString()}{" "}
+                {s.pledges.toLocaleString()}{" "}
                 <span className="text-sm">
-                  {pluralize("pledge", s.pledgesOnline)}
+                  {pluralize("pledge", s.pledges)}
                 </span>
               </>
             ),
-            pledges: s.pledgesOnline,
-            score: s.pledgesOnline,
+            pledges: s.pledges,
+            score: s.pledges,
           }));
 
         return (

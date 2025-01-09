@@ -35,7 +35,7 @@ export default async function Animal({
   const students = classroom.students.sort(
     (a, b) =>
       b.minutes - a.minutes ||
-      b.pledgesOnline - a.pledgesOnline ||
+      b.pledges - a.pledges ||
       a.displayName.localeCompare(b.displayName),
   );
 
@@ -49,7 +49,7 @@ export default async function Animal({
     );
   const position = gradeClasses.findIndex((c) => c === classroom) + 1;
 
-  const classPledges = students.reduce((acc, s) => acc + s.pledgesOnline, 0);
+  const classPledges = students.reduce((acc, s) => acc + s.pledges, 0);
 
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
@@ -129,7 +129,7 @@ export default async function Animal({
                     <ClockIcon /> <Minutes minutes={s.minutes} />
                   </>
                 ),
-                pledges: s.pledgesOnline,
+                pledges: s.pledges,
                 score: s.minutes,
               }))}
               awards={3}

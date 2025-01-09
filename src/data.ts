@@ -145,6 +145,30 @@ function parseRoster(): Promise<Map<string, Set<string>>> {
   });
 }
 
+type OfflinePledgesRow = {
+  pledges: number;
+  firstName: string;
+  lastName: string;
+  class: string;
+};
+
+function parseOfflinePledges(): Promise<OfflinePledgesRow[]> {
+  const file = fs.readFileSync(
+    path.join(process.cwd(), "./src/2024-offline-pledges.csv"),
+    "utf8",
+  );
+  return new Promise((resolve, reject) => {
+    Papa.parse<OfflinePledgesRow>(file, {
+      header: true,
+      dynamicTyping: true,
+      error: reject,
+      complete: (results) => {
+        resolve(results.data);
+      },
+    });
+  });
+}
+
 function isMixedCase(s: string) {
   return s.toLocaleUpperCase() !== s && s.toLocaleLowerCase() !== s;
 }
@@ -163,9 +187,10 @@ function fullName(firstName: string, lastName: string) {
 }
 
 export async function loadStudents() {
-  const [roster, [csv, lastUpdate]] = await Promise.all([
+  const [roster, [csv, lastUpdate], offlinePledges] = await Promise.all([
     parseRoster(),
     parseCSV(),
+    parseOfflinePledges(),
   ]);
 
   const [badClasses, rawStudents] = partition(
@@ -215,6 +240,17 @@ export async function loadStudents() {
       }
     }
 
+    // add offline pledges
+    if (lastName === "Ramirez") {
+      console.error("dmndhere");
+    }
+    const offlinePledge = offlinePledges.find(
+      (p) =>
+        p.firstName === firstName &&
+        p.lastName === lastName &&
+        p.class === classroom,
+    );
+
     const match = /^(\w)(\w+)(\w{3}).*$/.exec(classroom);
     if (!match) {
       console.error("Failed to match", s["Class Name"]);
@@ -233,6 +269,10 @@ export async function loadStudents() {
     invariant(rawGrade != null);
     const grade = rawGrade === "K" ? 0 : Number.parseInt(rawGrade);
 
+    const pledgesOnline =
+      s["Online Donation #"] + s["Potential Online Donation #"];
+    const pledgesOffline = offlinePledge?.pledges ?? 0;
+
     return [
       {
         id: [campus, rawGrade, animal, lastName, firstName].join("|"),
@@ -243,22 +283,28 @@ export async function loadStudents() {
         animal: kebabify(animal),
         grade,
         movedFrom,
-        pledgesOnline:
-          s["Online Donation #"] + s["Potential Online Donation #"],
-        pledgesOffline: 0, // TODO
+        _pledgesOnline: pledgesOnline,
+        _pledgesOffline: pledgesOffline,
+        pledges: pledgesOnline + pledgesOffline,
         minutes: s["Minute Count"],
         expectedRaised: s["Total + Potential"],
       },
     ];
   });
 
+  console.log(
+    "dmndst",
+    students.filter((s) => s.lastName === "Ramirez"),
+  );
+
   // merge duplicates
   const uniqStudents = new Map<string, (typeof students)[number]>();
   for (const s of students) {
     const existing = uniqStudents.get(s.id);
     if (existing != null) {
-      existing.pledgesOnline += s.pledgesOnline;
-      existing.pledgesOffline += s.pledgesOffline;
+      existing._pledgesOnline += s._pledgesOnline;
+      existing._pledgesOffline += s._pledgesOffline;
+      existing.pledges += s.pledges;
       existing.minutes += s.minutes;
       existing.expectedRaised += s.expectedRaised;
       existing._raw.push(...s._raw);
@@ -289,7 +335,7 @@ export async function loadData(campus: string) {
     .sort(
       (a, b) =>
         b.minutes - a.minutes ||
-        b.pledgesOnline - a.pledgesOnline ||
+        b.pledges - a.pledges ||
         b.displayName.localeCompare(a.displayName),
     );
 
@@ -297,7 +343,7 @@ export async function loadData(campus: string) {
     .slice()
     .sort(
       (a, b) =>
-        b.pledgesOnline - a.pledgesOnline ||
+        b.pledges - a.pledges ||
         b.minutes - a.minutes ||
         b.displayName.localeCompare(a.displayName),
     );
@@ -319,10 +365,7 @@ export async function loadData(campus: string) {
             grade: students[0]!.grade,
             campus: students[0]!.campus,
             animal: students[0]!.animal,
-            pledges: students.reduce(
-              (x, s) => x + s.pledgesOnline + s.pledgesOffline,
-              0,
-            ),
+            pledges: students.reduce((x, s) => x + s.pledges, 0),
             minutes: students.reduce((x, s) => x + s.minutes, 0),
           },
         ];
