@@ -3,7 +3,7 @@ import { ClockIcon } from "~/app/_components/ClockIcon";
 import { GradeLabel } from "~/app/_components/GradeLabel";
 import GradeRankingTable from "~/app/_components/GradeRankingTable";
 import { Minutes } from "~/app/_components/Minutes";
-import RankingTable from "~/app/_components/RankingTable";
+import DeprecatedRankingTable from "~/app/_components/DeprecatedRankingTable";
 import { className, loadData } from "~/data";
 import { humanize } from "~/string";
 import { type Campus, campuses } from "~/types";
@@ -119,7 +119,7 @@ export default async function Animal({
             {humanize(animal)} class readers
           </h2>
           {(students[0]?.minutes ?? 0 > 0) ? (
-            <RankingTable
+            <DeprecatedRankingTable
               showPledges
               rows={students.map((s) => ({
                 key: s.id,

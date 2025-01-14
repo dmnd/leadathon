@@ -9,7 +9,7 @@ import PledgestarTippy from "./PledgestarTippy";
 const highlightStyles =
   "bg-yellow-300/70 font-bold shadow-2xl text-shadow py-1";
 
-export default function RankingTable({
+export default function DeprecatedRankingTable({
   rows,
   showPledges = false,
   awards,
