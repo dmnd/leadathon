@@ -3,7 +3,6 @@ import TopReadingClass from "~/app/_components/TopReadingClass";
 import { loadData, loadStudents } from "~/data";
 import { type Campus, campuses, type Student } from "~/types";
 import { ClockIcon } from "../_components/ClockIcon";
-import RankingTable from "../_components/RankingTable";
 import { Box } from "../_components/Box";
 import { Minutes } from "../_components/Minutes";
 import { notFound } from "next/navigation";
@@ -61,42 +60,34 @@ export default async function Home({
 
   const { students, lastUpdate } = await loadStudents();
 
-  const campusStudents = groupBy(students, (s) => s.campus);
-
-  const campusStats = new Map(
-    [...campusStudents.entries()].map(([campus, students]) => [
-      campus,
-      {
+  const campusRows = awardPrizes(
+    [...groupBy(students, (s) => s.campus).entries()]
+      .map(([campus, students]) => ({
         campus,
         minutes: students.reduce((a, s) => a + s.minutes, 0),
         pledges: students.reduce((a, s) => a + s.pledges, 0),
         raised: students.reduce((a, s) => a + s.expectedRaised, 0),
         classes: new Set(students.map((s) => s.animal)).size, // TODO: include nonparticipating classes
-      },
-    ]),
-  );
-
-  const campusRows = awardPrizes(
-    Array.from(campusStats.entries())
-      .map(([c, stats]) => ({
+      }))
+      .map((c) => ({
         contents: (
           <Link
             className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
-            href={`/${c.toLowerCase()}`}
+            href={`/${c.campus.toLowerCase()}`}
           >
-            {campuses[c]}
+            {campuses[c.campus]}
           </Link>
         ),
         scoreCell: (
           <>
-            {(stats.pledges / stats.classes).toFixed(1).toLocaleString()}{" "}
+            {(c.pledges / c.classes).toFixed(1).toLocaleString()}{" "}
             <span className="text-sm">pledges per class</span>
           </>
         ),
-        pledges: stats.pledges,
-        key: c,
-        score: stats.pledges / stats.classes,
-        highlight: c === campus,
+        pledges: c.pledges,
+        key: c.campus,
+        score: c.pledges / c.classes,
+        highlight: c.campus === campus,
       }))
       .sort((a, b) => b.score - a.score || a.key.localeCompare(b.key)),
     0,
