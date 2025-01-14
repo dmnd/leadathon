@@ -20,7 +20,6 @@ export default function GradeRankingTable({
 }) {
   return (
     <RankingTable
-      showPledges
       rows={classes.map((c) => ({
         key: c.className,
         contents: (
