@@ -76,6 +76,32 @@ export default async function Home({
     ]),
   );
 
+  const campusRows = awardPrizes(
+    Array.from(campusStats.entries())
+      .map(([c, stats]) => ({
+        contents: (
+          <Link
+            className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
+            href={`/${c.toLowerCase()}`}
+          >
+            {campuses[c]}
+          </Link>
+        ),
+        scoreCell: (
+          <>
+            {(stats.pledges / stats.classes).toFixed(1).toLocaleString()}{" "}
+            <span className="text-sm">pledges per class</span>
+          </>
+        ),
+        pledges: stats.pledges,
+        key: c,
+        score: stats.pledges / stats.classes,
+        highlight: c === campus,
+      }))
+      .sort((a, b) => b.score - a.score || a.key.localeCompare(b.key)),
+    0,
+  );
+
   const {
     classes: campusClasses,
     topReaders,
@@ -125,34 +151,7 @@ export default async function Home({
         {/* School level competitions */}
         <Box className="md:col-span-2">
           <h2 className="text-xl font-bold">Campuses</h2>
-          <RankingTable
-            awards={0}
-            targetRows={campusStats.size}
-            rows={Array.from(campusStats.entries())
-              .map(([c, stats]) => ({
-                contents: (
-                  <Link
-                    className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
-                    href={`/${c.toLowerCase()}`}
-                  >
-                    {campuses[c]}
-                  </Link>
-                ),
-                scoreCell: (
-                  <>
-                    {(stats.pledges / stats.classes)
-                      .toFixed(1)
-                      .toLocaleString()}{" "}
-                    <span className="text-sm">pledges per class</span>
-                  </>
-                ),
-                pledges: stats.pledges,
-                key: c,
-                score: stats.pledges / stats.classes,
-                highlight: c === campus,
-              }))
-              .sort((a, b) => b.score - a.score || a.key.localeCompare(b.key))}
-          />
+          <DumbRankingTable rows={campusRows} minRows={campusRows.length} />
         </Box>
 
         {/* Grade level competitions */}
@@ -162,7 +161,7 @@ export default async function Home({
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top readers</h2>
           {(topReaders[0]?.minutes ?? 0 > 0) ? (
-            <DumbRankingTable rows={topReadersRows} minRows={10} />
+            <DumbRankingTable rows={topReadersRows} />
           ) : (
             <span className="text-white/70">Nobody yet. Log your reading!</span>
           )}

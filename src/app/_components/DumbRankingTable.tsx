@@ -10,7 +10,7 @@ const highlightStyles =
 
 export default function DumbRankingTable({
   rows,
-  minRows,
+  minRows = rows.length,
 }: {
   rows: Array<
     [
@@ -25,7 +25,7 @@ export default function DumbRankingTable({
       boolean,
     ]
   >;
-  minRows: number;
+  minRows?: number;
 }) {
   const [prizeRows, nonPrizeRows] = partition(rows, ([, , prize]) => prize);
   const n = Math.max(0, minRows - prizeRows.length);
