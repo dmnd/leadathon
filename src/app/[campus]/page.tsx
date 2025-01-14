@@ -12,6 +12,7 @@ import { humanize } from "~/string";
 import Link from "next/link";
 import { GradeLabel } from "../_components/GradeLabel";
 import Footer from "../_components/Footer";
+import DumbRankingTable from "../_components/DumbRankingTable";
 
 function Student({ student }: { student: Student }) {
   return (
@@ -22,6 +23,30 @@ function Student({ student }: { student: Student }) {
       </span>
     </>
   );
+}
+
+function awardPrizes<T extends { score: number }>(
+  rows: Array<T>,
+  prizes: number,
+): Array<[number, T, boolean]> {
+  if (rows.length === 0) {
+    return [];
+  }
+  const ranks: Array<[number, T, boolean]> = [];
+  let lastScore = rows[0]!.score;
+  let rank = 1;
+  let equalRank = 0;
+  for (const r of rows) {
+    if (r.score < lastScore) {
+      rank = rank + equalRank;
+      equalRank = 1;
+      lastScore = r.score;
+    } else {
+      equalRank = equalRank + 1;
+    }
+    ranks.push([rank, r, r.score > 0 && rank <= prizes]);
+  }
+  return ranks;
 }
 
 export default async function Home({
@@ -57,6 +82,36 @@ export default async function Home({
     topPledgers,
   } = await loadData(campus);
 
+  const topReadersRows = awardPrizes(
+    topReaders.map((s) => ({
+      contents: <Student student={s} />,
+      scoreCell: (
+        <>
+          <ClockIcon /> <Minutes minutes={s.minutes} />
+        </>
+      ),
+      pledges: s.pledges,
+      key: s.id,
+      score: s.minutes,
+    })),
+    10,
+  );
+
+  const topPledgersRows = awardPrizes(
+    topPledgers.map((s) => ({
+      contents: <Student student={s} />,
+      scoreCell: (
+        <>
+          {s.pledges.toLocaleString()} <span className="text-sm">pledges</span>
+        </>
+      ),
+      pledges: s.pledges,
+      key: s.id,
+      score: s.pledges,
+    })),
+    5,
+  );
+
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
       <div className="flex items-center gap-4">
@@ -67,6 +122,7 @@ export default async function Home({
       </div>
 
       <div className="grid w-full grid-cols-1 gap-4 md:w-auto md:grid-cols-3 md:gap-8">
+        {/* School level competitions */}
         <Box className="md:col-span-2">
           <h2 className="text-xl font-bold">Campuses</h2>
           <RankingTable
@@ -99,56 +155,31 @@ export default async function Home({
           />
         </Box>
 
+        {/* Grade level competitions */}
         <TopReadingClass classes={campusClasses} />
 
+        {/* Campus top readers */}
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top readers</h2>
           {(topReaders[0]?.minutes ?? 0 > 0) ? (
-            <RankingTable
-              rows={topReaders.map((s) => ({
-                contents: <Student student={s} />,
-                scoreCell: (
-                  <>
-                    <ClockIcon /> <Minutes minutes={s.minutes} />
-                  </>
-                ),
-                pledges: s.pledges,
-                key: s.id,
-                score: s.minutes,
-              }))}
-              awards={10}
-              targetRows={10}
-            />
+            <DumbRankingTable rows={topReadersRows} minRows={10} />
           ) : (
             <span className="text-white/70">Nobody yet. Log your reading!</span>
           )}
         </Box>
 
+        {/* Campus top pledgers */}
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top pledgers</h2>
           {(topPledgers[0]?.pledges ?? 0 > 0) ? (
-            <RankingTable
-              rows={topPledgers.map((s) => ({
-                contents: <Student student={s} />,
-                scoreCell: (
-                  <>
-                    {s.pledges.toLocaleString()}{" "}
-                    <span className="text-sm">pledges</span>
-                  </>
-                ),
-                pledges: s.pledges,
-                key: s.id,
-                score: s.pledges,
-              }))}
-              awards={5}
-              targetRows={10}
-            />
+            <DumbRankingTable rows={topPledgersRows} minRows={10} />
           ) : (
             <span className="text-white/70">None yet. Go get pledges!</span>
           )}
         </Box>
       </div>
 
+      {/* Campus race for 80 pledges */}
       <div className="w-full max-w-4xl">
         <h2 className="mb-4 text-xl font-bold">Race for 80 pledges</h2>
         <div className="relative">
