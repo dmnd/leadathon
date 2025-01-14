@@ -1,6 +1,6 @@
 import CampusSelector from "~/app/_components/CampusSelector";
 import TopReadingClass from "~/app/_components/TopReadingClass";
-import { loadData, loadStudents } from "~/data";
+import { awardPrizes, loadData, loadStudents } from "~/data";
 import { type Campus, campuses, type Student } from "~/types";
 import { ClockIcon } from "../_components/ClockIcon";
 import { Box } from "../_components/Box";
@@ -22,30 +22,6 @@ function Student({ student }: { student: Student }) {
       </span>
     </>
   );
-}
-
-function awardPrizes<T extends { score: number }>(
-  rows: Array<T>,
-  prizes: number,
-): Array<[number, T, boolean]> {
-  if (rows.length === 0) {
-    return [];
-  }
-  const ranks: Array<[number, T, boolean]> = [];
-  let lastScore = rows[0]!.score;
-  let rank = 1;
-  let equalRank = 0;
-  for (const r of rows) {
-    if (r.score < lastScore) {
-      rank = rank + equalRank;
-      equalRank = 1;
-      lastScore = r.score;
-    } else {
-      equalRank = equalRank + 1;
-    }
-    ranks.push([rank, r, r.score > 0 && rank <= prizes]);
-  }
-  return ranks;
 }
 
 export default async function Home({
@@ -152,7 +128,7 @@ export default async function Home({
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top readers</h2>
           {(topReaders[0]?.minutes ?? 0 > 0) ? (
-            <DumbRankingTable rows={topReadersRows} />
+            <DumbRankingTable rows={topReadersRows} minRows={10} />
           ) : (
             <span className="text-white/70">Nobody yet. Log your reading!</span>
           )}
