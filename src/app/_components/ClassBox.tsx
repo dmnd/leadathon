@@ -1,6 +1,6 @@
 import type { Class } from "../../types";
 import { GradeLabel } from "./GradeLabel";
-import DumbRankingTable from "./DumbRankingTable";
+import RankingTable from "./RankingTable";
 import { ClockIcon } from "./ClockIcon";
 import GradeRankingTable from "./GradeRankingTable";
 import { Box } from "./Box";
@@ -66,14 +66,14 @@ export default function ClassBox({ classes }: { classes: Array<Class> }) {
 
       <h2 className="text-xl font-bold">Top readers</h2>
       {(topReaders[0]?.[1].score ?? 0 > 0) ? (
-        <DumbRankingTable rows={topReaders} minRows={5} />
+        <RankingTable rows={topReaders} minRows={5} />
       ) : (
         <span className="text-white/70">Nobody yet. Log your reading!</span>
       )}
 
       <h2 className="text-xl font-bold">Top pledgers</h2>
       {(topPledgers[0]?.[1].score ?? 0 > 0) ? (
-        <DumbRankingTable rows={topPledgers} minRows={3} />
+        <RankingTable rows={topPledgers} minRows={3} />
       ) : (
         <span className="text-white/70">Nobody has pledges yet!</span>
       )}

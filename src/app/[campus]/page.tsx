@@ -11,7 +11,7 @@ import { humanize } from "~/string";
 import Link from "next/link";
 import { GradeLabel } from "../_components/GradeLabel";
 import Footer from "../_components/Footer";
-import DumbRankingTable from "../_components/DumbRankingTable";
+import RankingTable from "../_components/RankingTable";
 
 function Student({ student }: { student: Student }) {
   return (
@@ -137,7 +137,7 @@ export default async function Home({
         {/* School level competitions */}
         <Box className="md:col-span-2">
           <h2 className="text-xl font-bold">Campuses</h2>
-          <DumbRankingTable rows={campusRows} minRows={campusRows.length} />
+          <RankingTable rows={campusRows} minRows={campusRows.length} />
         </Box>
 
         {/* Grade level competitions */}
@@ -149,7 +149,7 @@ export default async function Home({
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top readers</h2>
           {(topReaders[0]?.minutes ?? 0 > 0) ? (
-            <DumbRankingTable rows={topReadersRows} minRows={10} />
+            <RankingTable rows={topReadersRows} minRows={10} />
           ) : (
             <span className="text-white/70">Nobody yet. Log your reading!</span>
           )}
@@ -159,7 +159,7 @@ export default async function Home({
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top pledgers</h2>
           {(topPledgers[0]?.pledges ?? 0 > 0) ? (
-            <DumbRankingTable rows={topPledgersRows} minRows={10} />
+            <RankingTable rows={topPledgersRows} minRows={10} />
           ) : (
             <span className="text-white/70">None yet. Go get pledges!</span>
           )}

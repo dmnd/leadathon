@@ -8,7 +8,7 @@ import { partition } from "~/array";
 const highlightStyles =
   "bg-yellow-300/70 font-bold shadow-2xl text-shadow py-1";
 
-export default function DumbRankingTable({
+export default function RankingTable({
   rows,
   minRows = rows.length,
 }: {

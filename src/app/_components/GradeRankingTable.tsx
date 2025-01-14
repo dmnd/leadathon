@@ -1,4 +1,4 @@
-import DumbRankingTable from "./DumbRankingTable";
+import RankingTable from "./RankingTable";
 import Link from "next/link";
 import { ClockIcon } from "./ClockIcon";
 import type { Class } from "../../types";
@@ -42,5 +42,5 @@ export default function GradeRankingTable({
     })),
     1,
   );
-  return <DumbRankingTable rows={rows} />;
+  return <RankingTable rows={rows} />;
 }
