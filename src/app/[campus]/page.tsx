@@ -1,5 +1,5 @@
 import CampusSelector from "~/app/_components/CampusSelector";
-import TopReadingClass from "~/app/_components/TopReadingClass";
+import ClassBox from "~/app/_components/ClassBox";
 import { awardPrizes, loadData, loadStudents } from "~/data";
 import { type Campus, campuses, type Student } from "~/types";
 import { ClockIcon } from "../_components/ClockIcon";
@@ -75,6 +75,25 @@ export default async function Home({
     topPledgers,
   } = await loadData(campus);
 
+  const gradeLeagues = groupBy(
+    campusClasses.values(),
+    (c) => `${c.campus}${c.grade}`,
+  );
+
+  const minutesGradeLeagues = new Map(
+    Array.from(gradeLeagues.entries()).map(([league, classes]) => [
+      league,
+      classes
+        .slice()
+        .sort(
+          (a, b) =>
+            b.minutes - a.minutes ||
+            b.pledges - a.pledges ||
+            a.animal.localeCompare(b.animal),
+        ),
+    ]),
+  );
+
   const topReadersRows = awardPrizes(
     topReaders.map((s) => ({
       contents: <Student student={s} />,
@@ -122,7 +141,9 @@ export default async function Home({
         </Box>
 
         {/* Grade level competitions */}
-        <TopReadingClass classes={campusClasses} />
+        {[...minutesGradeLeagues.entries()].sort().map(([league, classes]) => (
+          <ClassBox key={league} classes={classes} />
+        ))}
 
         {/* Campus top readers */}
         <Box>
