@@ -36,7 +36,11 @@ export default async function Home({
 
   const { students, lastUpdate } = await loadStudents();
 
-  const campusRows = awardPrizes(
+  // TODO: awardPrizes should sort items itself
+  const getScore = (c: { pledges: number; classes: number }) =>
+    c.pledges / c.classes;
+  const topCampuses = awardPrizes(
+    0,
     [...groupBy(students, (s) => s.campus).entries()]
       .map(([campus, students]) => ({
         campus,
@@ -45,28 +49,33 @@ export default async function Home({
         raised: students.reduce((a, s) => a + s.expectedRaised, 0),
         classes: new Set(students.map((s) => s.animal)).size, // TODO: include nonparticipating classes
       }))
-      .map((c) => ({
-        contents: (
-          <Link
-            className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
-            href={`/${c.campus.toLowerCase()}`}
-          >
-            {campuses[c.campus]}
-          </Link>
-        ),
-        scoreCell: (
-          <>
-            {(c.pledges / c.classes).toFixed(1).toLocaleString()}{" "}
-            <span className="text-sm">pledges per class</span>
-          </>
-        ),
-        pledges: c.pledges,
-        key: c.campus,
-        score: c.pledges / c.classes,
-        highlight: c.campus === campus,
-      }))
-      .sort((a, b) => b.score - a.score || a.key.localeCompare(b.key)),
-    0,
+      .sort(
+        (a, b) => getScore(b) - getScore(a) || a.campus.localeCompare(b.campus),
+      ),
+    getScore,
+  ).map(
+    (ranking) =>
+      [
+        ranking,
+        {
+          key: ranking.item.campus,
+          highlight: ranking.item.campus === campus,
+          contents: (
+            <Link
+              className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
+              href={`/${ranking.item.campus.toLowerCase()}`}
+            >
+              {campuses[ranking.item.campus]}
+            </Link>
+          ),
+          scoreCell: (
+            <>
+              {ranking.score.toFixed(1).toLocaleString()}{" "}
+              <span className="text-sm">pledges per class</span>
+            </>
+          ),
+        },
+      ] as const,
   );
 
   const {
@@ -94,34 +103,37 @@ export default async function Home({
     ]),
   );
 
-  const topReadersRows = awardPrizes(
-    topReaders.map((s) => ({
-      contents: <Student student={s} />,
-      scoreCell: (
-        <>
-          <ClockIcon /> <Minutes minutes={s.minutes} />
-        </>
-      ),
-      pledges: s.pledges,
-      key: s.id,
-      score: s.minutes,
-    })),
-    10,
+  const topReadersRows = awardPrizes(10, topReaders, (r) => r.minutes).map(
+    (ranking) =>
+      [
+        ranking,
+        {
+          key: ranking.item.id,
+          contents: <Student student={ranking.item} />,
+          scoreCell: (
+            <>
+              <ClockIcon /> <Minutes minutes={ranking.item.minutes} />
+            </>
+          ),
+        },
+      ] as const,
   );
 
-  const topPledgersRows = awardPrizes(
-    topPledgers.map((s) => ({
-      contents: <Student student={s} />,
-      scoreCell: (
-        <>
-          {s.pledges.toLocaleString()} <span className="text-sm">pledges</span>
-        </>
-      ),
-      pledges: s.pledges,
-      key: s.id,
-      score: s.pledges,
-    })),
-    5,
+  const topPledgersRows = awardPrizes(5, topPledgers, (s) => s.pledges).map(
+    (ranking) =>
+      [
+        ranking,
+        {
+          key: ranking.item.id,
+          contents: <Student student={ranking.item} />,
+          scoreCell: (
+            <>
+              {ranking.item.pledges.toLocaleString()}{" "}
+              <span className="text-sm">pledges</span>
+            </>
+          ),
+        },
+      ] as const,
   );
 
   return (
@@ -137,7 +149,7 @@ export default async function Home({
         {/* School level competitions */}
         <Box className="md:col-span-2">
           <h2 className="text-xl font-bold">Campuses</h2>
-          <RankingTable rows={campusRows} minRows={campusRows.length} />
+          <RankingTable rows={topCampuses} minRows={topCampuses.length} />
         </Box>
 
         {/* Grade level competitions */}

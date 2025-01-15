@@ -10,6 +10,7 @@ import { awardPrizes } from "~/data";
 
 export default function ClassBox({ classes }: { classes: Array<Class> }) {
   const topReaders = awardPrizes(
+    5,
     classes
       .flatMap((c) => c.students)
       .sort(
@@ -17,22 +18,26 @@ export default function ClassBox({ classes }: { classes: Array<Class> }) {
           b.minutes - a.minutes ||
           b.pledges - a.pledges ||
           a.displayName.localeCompare(b.displayName),
-      )
-      .map((s) => ({
-        key: s.id,
-        contents: s.displayName,
-        scoreCell: (
-          <>
-            <ClockIcon /> <Minutes minutes={s.minutes} />
-          </>
-        ),
-        pledges: s.pledges,
-        score: s.minutes,
-      })),
-    5,
+      ),
+    (s) => s.minutes,
+  ).map(
+    (ranking) =>
+      [
+        ranking,
+        {
+          key: ranking.item.id,
+          contents: ranking.item.displayName,
+          scoreCell: (
+            <>
+              <ClockIcon /> <Minutes minutes={ranking.item.minutes} />
+            </>
+          ),
+        },
+      ] as const,
   );
 
   const topPledgers = awardPrizes(
+    3,
     classes
       .flatMap((c) => c.students)
       .sort(
@@ -41,20 +46,25 @@ export default function ClassBox({ classes }: { classes: Array<Class> }) {
           b.minutes - a.minutes ||
           a.displayName.localeCompare(b.displayName),
       )
-      .filter((s) => s.pledges > 0)
-      .map((s) => ({
-        key: s.id,
-        contents: s.displayName,
-        scoreCell: (
-          <>
-            {s.pledges.toLocaleString()}{" "}
-            <span className="text-sm">{pluralize("pledge", s.pledges)}</span>
-          </>
-        ),
-        pledges: s.pledges,
-        score: s.pledges,
-      })),
-    3,
+      .filter((s) => s.pledges > 0),
+    (s) => s.pledges,
+  ).map(
+    (ranking) =>
+      [
+        ranking,
+        {
+          key: ranking.item.id,
+          contents: ranking.item.displayName,
+          scoreCell: (
+            <>
+              {ranking.item.pledges.toLocaleString()}{" "}
+              <span className="text-sm">
+                {pluralize("pledge", ranking.item.pledges)}
+              </span>
+            </>
+          ),
+        },
+      ] as const,
   );
 
   return (
@@ -65,14 +75,14 @@ export default function ClassBox({ classes }: { classes: Array<Class> }) {
       <GradeRankingTable classes={classes} />
 
       <h2 className="text-xl font-bold">Top readers</h2>
-      {(topReaders[0]?.[1].score ?? 0 > 0) ? (
+      {(topReaders[0]?.[0].score ?? 0 > 0) ? (
         <RankingTable rows={topReaders} minRows={5} />
       ) : (
         <span className="text-white/70">Nobody yet. Log your reading!</span>
       )}
 
       <h2 className="text-xl font-bold">Top pledgers</h2>
-      {(topPledgers[0]?.[1].score ?? 0 > 0) ? (
+      {(topPledgers[0]?.[0].score ?? 0 > 0) ? (
         <RankingTable rows={topPledgers} minRows={3} />
       ) : (
         <span className="text-white/70">Nobody has pledges yet!</span>

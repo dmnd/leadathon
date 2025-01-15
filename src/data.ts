@@ -382,26 +382,40 @@ export async function loadData(campus: string) {
   };
 }
 
-export function awardPrizes<T extends { score: number }>(
-  rows: Array<T>,
+export type CompetitionRank<T> = {
+  item: T;
+  score: number;
+  rank: number;
+  prize: boolean;
+};
+
+export function awardPrizes<T>(
   prizes: number,
-): Array<[number, T, boolean]> {
-  if (rows.length === 0) {
+  items: Array<T>,
+  f: (row: T) => number,
+): Array<CompetitionRank<T>> {
+  if (items.length === 0) {
     return [];
   }
-  const ranks: Array<[number, T, boolean]> = [];
-  let lastScore = rows[0]!.score;
+  const ranks: Array<CompetitionRank<T>> = [];
+  let lastScore = f(items[0]!);
   let rank = 1;
   let equalRank = 0;
-  for (const r of rows) {
-    if (r.score < lastScore) {
+  for (const r of items) {
+    const score = f(r);
+    if (score < lastScore) {
       rank = rank + equalRank;
       equalRank = 1;
-      lastScore = r.score;
+      lastScore = score;
     } else {
       equalRank = equalRank + 1;
     }
-    ranks.push([rank, r, r.score > 0 && rank <= prizes]);
+    ranks.push({
+      item: r,
+      score,
+      rank,
+      prize: score > 0 && rank <= prizes,
+    });
   }
   return ranks;
 }

@@ -4,30 +4,28 @@ import Tippy from "./Tippy";
 import clsx from "clsx/lite";
 import PledgestarTippy from "./PledgestarTippy";
 import { partition } from "~/array";
+import { type CompetitionRank } from "~/data";
 
 const highlightStyles =
   "bg-yellow-300/70 font-bold shadow-2xl text-shadow py-1";
 
-export default function RankingTable({
-  rows,
-  minRows = rows.length,
-}: {
-  rows: Array<
-    [
-      number,
-      {
-        contents: React.ReactNode;
-        scoreCell: React.ReactNode;
-        key: string;
-        score: number;
-        highlight?: boolean;
-      },
-      boolean,
-    ]
-  >;
+type DisplayRow = Readonly<{
+  contents: React.ReactNode;
+  scoreCell: React.ReactNode;
+  key: string;
+  highlight?: boolean;
+}>;
+
+type RankingTableProps<T> = Readonly<{
+  rows: ReadonlyArray<readonly [CompetitionRank<T>, DisplayRow]>;
   minRows?: number;
-}) {
-  const [prizeRows, nonPrizeRows] = partition(rows, ([, , prize]) => prize);
+}>;
+
+export default function RankingTable<T>({
+  rows,
+  minRows = 0,
+}: RankingTableProps<T>) {
+  const [prizeRows, nonPrizeRows] = partition(rows, ([{ prize }]) => prize);
   const n = Math.max(0, minRows - prizeRows.length);
   const fillerRows = nonPrizeRows.slice(0, n);
   const equalRankFillerRows =
@@ -39,7 +37,7 @@ export default function RankingTable({
   return (
     <table className="w-full">
       <tbody>
-        {displayRows.map(([rank, r, prize]) => (
+        {displayRows.map(([{ score, rank, prize }, r]) => (
           <tr className="whitespace-nowrap" key={r.key}>
             <td
               className={`w-12 select-none py-1 pr-1 text-right tabular-nums text-white ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
@@ -56,7 +54,7 @@ export default function RankingTable({
                 </span>
               ) : (
                 <span className="pr-1">
-                  {r.score > 0 ? (
+                  {score > 0 ? (
                     <>
                       <span className="text-xs">#</span>
                       {rank}
@@ -70,7 +68,7 @@ export default function RankingTable({
             <td
               className={clsx(
                 r.highlight && highlightStyles,
-                r.score === 0 && "text-white/30",
+                score === 0 && "text-white/30",
               )}
             >
               {r.contents}
@@ -82,7 +80,7 @@ export default function RankingTable({
                 "rounded-r-md pr-2",
               )}
             >
-              {r.score > 0 ? (
+              {score > 0 ? (
                 r.scoreCell
               ) : (
                 <Tippy
