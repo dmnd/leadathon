@@ -19,28 +19,26 @@ export default function GradeRankingTable({
   classes: Array<Class>;
   viewer?: string;
 }) {
-  const rows = awardPrizes(1, classes, (c) => c.minutes).map(
-    (ranking) =>
-      [
-        ranking,
-        {
-          key: ranking.item.className,
-          contents: (
-            <Link
-              className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
-              href={toURL(ranking.item)}
-            >
-              {humanize(ranking.item.animal)}
-            </Link>
-          ),
-          scoreCell: (
-            <>
-              <ClockIcon /> <Minutes minutes={ranking.item.minutes} />
-            </>
-          ),
-          highlight: ranking.item.className === viewer,
-        },
-      ] as const,
+  const rows = awardPrizes(1, classes, (c) => c.minutes);
+  return (
+    <RankingTable
+      rows={rows}
+      minRows={rows.length}
+      keyFn={(x) => x.className}
+      highlight={({ item: { className } }) => className === viewer}
+      description={({ item }) => (
+        <Link
+          className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
+          href={toURL(item)}
+        >
+          {humanize(item.animal)}
+        </Link>
+      )}
+      score={({ item: { minutes } }) => (
+        <>
+          <ClockIcon /> <Minutes minutes={minutes} />
+        </>
+      )}
+    />
   );
-  return <RankingTable rows={rows} minRows={rows.length} />;
 }

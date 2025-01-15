@@ -20,20 +20,6 @@ export default function ClassBox({ classes }: { classes: Array<Class> }) {
           a.displayName.localeCompare(b.displayName),
       ),
     (s) => s.minutes,
-  ).map(
-    (ranking) =>
-      [
-        ranking,
-        {
-          key: ranking.item.id,
-          contents: ranking.item.displayName,
-          scoreCell: (
-            <>
-              <ClockIcon /> <Minutes minutes={ranking.item.minutes} />
-            </>
-          ),
-        },
-      ] as const,
   );
 
   const topPledgers = awardPrizes(
@@ -48,23 +34,6 @@ export default function ClassBox({ classes }: { classes: Array<Class> }) {
       )
       .filter((s) => s.pledges > 0),
     (s) => s.pledges,
-  ).map(
-    (ranking) =>
-      [
-        ranking,
-        {
-          key: ranking.item.id,
-          contents: ranking.item.displayName,
-          scoreCell: (
-            <>
-              {ranking.item.pledges.toLocaleString()}{" "}
-              <span className="text-sm">
-                {pluralize("pledge", ranking.item.pledges)}
-              </span>
-            </>
-          ),
-        },
-      ] as const,
   );
 
   return (
@@ -75,15 +44,38 @@ export default function ClassBox({ classes }: { classes: Array<Class> }) {
       <GradeRankingTable classes={classes} />
 
       <h2 className="text-xl font-bold">Top readers</h2>
-      {(topReaders[0]?.[0].score ?? 0 > 0) ? (
-        <RankingTable rows={topReaders} minRows={5} />
+      {(topReaders[0]?.score ?? 0 > 0) ? (
+        <RankingTable
+          rows={topReaders}
+          minRows={5}
+          keyFn={(x) => x.id}
+          description={({ item }) => item.displayName}
+          score={({ item }) => (
+            <>
+              <ClockIcon /> <Minutes minutes={item.minutes} />
+            </>
+          )}
+        />
       ) : (
         <span className="text-white/70">Nobody yet. Log your reading!</span>
       )}
 
       <h2 className="text-xl font-bold">Top pledgers</h2>
-      {(topPledgers[0]?.[0].score ?? 0 > 0) ? (
-        <RankingTable rows={topPledgers} minRows={3} />
+      {(topPledgers[0]?.score ?? 0 > 0) ? (
+        <RankingTable
+          rows={topPledgers}
+          minRows={3}
+          keyFn={(x) => x.id}
+          description={({ item }) => item.displayName}
+          score={({ item }) => (
+            <>
+              {item.pledges.toLocaleString()}{" "}
+              <span className="text-sm">
+                {pluralize("pledge", item.pledges)}
+              </span>
+            </>
+          )}
+        />
       ) : (
         <span className="text-white/70">Nobody has pledges yet!</span>
       )}

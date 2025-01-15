@@ -1,5 +1,3 @@
-"use client";
-
 import Tippy from "./Tippy";
 import clsx from "clsx/lite";
 import PledgestarTippy from "./PledgestarTippy";
@@ -9,55 +7,56 @@ import { type CompetitionRank } from "~/data";
 const highlightStyles =
   "bg-yellow-300/70 font-bold shadow-2xl text-shadow py-1";
 
-type DisplayRow = Readonly<{
-  contents: React.ReactNode;
-  scoreCell: React.ReactNode;
-  key: string;
-  highlight?: boolean;
-}>;
-
 type RankingTableProps<T> = Readonly<{
-  rows: ReadonlyArray<readonly [CompetitionRank<T>, DisplayRow]>;
+  rows: ReadonlyArray<CompetitionRank<T>>;
   minRows?: number;
+  keyFn: (x: T) => string;
+  description: (ranking: CompetitionRank<T>) => React.ReactNode;
+  score: (ranking: CompetitionRank<T>) => React.ReactNode;
+  highlight?: (ranking: CompetitionRank<T>) => boolean;
 }>;
 
 export default function RankingTable<T>({
   rows,
   minRows = 0,
+  keyFn,
+  description,
+  score,
+  highlight = () => false,
 }: RankingTableProps<T>) {
-  const [prizeRows, nonPrizeRows] = partition(rows, ([{ prize }]) => prize);
+  const [prizeRows, nonPrizeRows] = partition(rows, ({ prize }) => prize);
   const n = Math.max(0, minRows - prizeRows.length);
   const fillerRows = nonPrizeRows.slice(0, n);
   const equalRankFillerRows =
     fillerRows.length === 0
       ? []
-      : nonPrizeRows.slice(n).filter(([r]) => r === fillerRows.at(-1)![0]);
+      : nonPrizeRows.slice(n).filter((r) => r === fillerRows.at(-1)!);
   const displayRows = [...prizeRows, ...fillerRows, ...equalRankFillerRows];
 
   return (
     <table className="w-full">
       <tbody>
-        {displayRows.map(([{ score, rank, prize }, r]) => (
-          <tr className="whitespace-nowrap" key={r.key}>
+        {displayRows.map((r) => (
+          <tr className="whitespace-nowrap" key={keyFn(r.item)}>
             <td
-              className={`w-12 select-none py-1 pr-1 text-right tabular-nums text-white ${r.highlight ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
+              className={`w-12 select-none py-1 pr-1 text-right tabular-nums text-white ${highlight(r) ? `rounded-l-md ${highlightStyles} text-opacity-100` : "text-opacity-30"}`}
             >
-              {prize ? (
+              {r.prize ? (
                 <span
-                  className={`relative inline-block h-6 w-6 rounded-full text-center ${r.highlight ? "bg-white/90" : "bg-white/45"}`}
+                  className={`relative inline-block h-6 w-6 rounded-full text-center ${highlight(r) ? "bg-white/90" : "bg-white/45"}`}
                   style={{ mixBlendMode: "screen", color: "black" }}
                 >
                   <span className="relative -top-0.5 text-xs font-bold">
                     <span className="text-[.6rem]">#</span>
-                    {rank}
+                    {r.rank}
                   </span>
                 </span>
               ) : (
                 <span className="pr-1">
-                  {score > 0 ? (
+                  {r.score > 0 ? (
                     <>
                       <span className="text-xs">#</span>
-                      {rank}
+                      {r.rank}
                     </>
                   ) : (
                     "-"
@@ -67,27 +66,27 @@ export default function RankingTable<T>({
             </td>
             <td
               className={clsx(
-                r.highlight && highlightStyles,
-                score === 0 && "text-white/30",
+                highlight(r) && highlightStyles,
+                r.score === 0 && "text-white/30",
               )}
             >
-              {r.contents}
+              {description(r)}
             </td>
             <td
               className={clsx(
                 "text-right tabular-nums",
-                r.highlight && highlightStyles,
+                highlight(r) && highlightStyles,
                 "rounded-r-md pr-2",
               )}
             >
-              {score > 0 ? (
-                r.scoreCell
+              {r.score > 0 ? (
+                score(r)
               ) : (
                 <Tippy
                   content={
                     <PledgestarTippy
                       initial={
-                        <div>No reading logs found for {r.contents}.</div>
+                        <div>No reading logs found for {description(r)}.</div>
                       }
                     />
                   }

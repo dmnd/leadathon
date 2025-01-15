@@ -53,29 +53,6 @@ export default async function Home({
         (a, b) => getScore(b) - getScore(a) || a.campus.localeCompare(b.campus),
       ),
     getScore,
-  ).map(
-    (ranking) =>
-      [
-        ranking,
-        {
-          key: ranking.item.campus,
-          highlight: ranking.item.campus === campus,
-          contents: (
-            <Link
-              className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
-              href={`/${ranking.item.campus.toLowerCase()}`}
-            >
-              {campuses[ranking.item.campus]}
-            </Link>
-          ),
-          scoreCell: (
-            <>
-              {ranking.score.toFixed(1).toLocaleString()}{" "}
-              <span className="text-sm">pledges per class</span>
-            </>
-          ),
-        },
-      ] as const,
   );
 
   const {
@@ -103,39 +80,6 @@ export default async function Home({
     ]),
   );
 
-  const topReadersRows = awardPrizes(10, topReaders, (r) => r.minutes).map(
-    (ranking) =>
-      [
-        ranking,
-        {
-          key: ranking.item.id,
-          contents: <Student student={ranking.item} />,
-          scoreCell: (
-            <>
-              <ClockIcon /> <Minutes minutes={ranking.item.minutes} />
-            </>
-          ),
-        },
-      ] as const,
-  );
-
-  const topPledgersRows = awardPrizes(5, topPledgers, (s) => s.pledges).map(
-    (ranking) =>
-      [
-        ranking,
-        {
-          key: ranking.item.id,
-          contents: <Student student={ranking.item} />,
-          scoreCell: (
-            <>
-              {ranking.item.pledges.toLocaleString()}{" "}
-              <span className="text-sm">pledges</span>
-            </>
-          ),
-        },
-      ] as const,
-  );
-
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
       <div className="flex items-center gap-4">
@@ -149,7 +93,26 @@ export default async function Home({
         {/* School level competitions */}
         <Box className="md:col-span-2">
           <h2 className="text-xl font-bold">Campuses</h2>
-          <RankingTable rows={topCampuses} minRows={topCampuses.length} />
+          <RankingTable
+            rows={topCampuses}
+            minRows={topCampuses.length}
+            keyFn={(i) => i.campus}
+            highlight={({ item }) => item.campus === campus}
+            description={({ item }) => (
+              <Link
+                className="inline-block transition-transform hover:-translate-y-px hover:underline hover:underline-offset-4"
+                href={`/${item.campus.toLowerCase()}`}
+              >
+                {campuses[item.campus]}
+              </Link>
+            )}
+            score={({ score }) => (
+              <>
+                {score.toFixed(1).toLocaleString()}{" "}
+                <span className="text-sm">pledges per class</span>
+              </>
+            )}
+          />
         </Box>
 
         {/* Grade level competitions */}
@@ -160,8 +123,18 @@ export default async function Home({
         {/* Campus top readers */}
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top readers</h2>
-          {(topReaders[0]?.minutes ?? 0 > 0) ? (
-            <RankingTable rows={topReadersRows} minRows={10} />
+          {(topReaders[0]?.score ?? 0 > 0) ? (
+            <RankingTable
+              rows={topReaders}
+              minRows={10}
+              keyFn={(i) => i.id}
+              description={({ item }) => <Student student={item} />}
+              score={({ item }) => (
+                <>
+                  <ClockIcon /> <Minutes minutes={item.minutes} />
+                </>
+              )}
+            />
           ) : (
             <span className="text-white/70">Nobody yet. Log your reading!</span>
           )}
@@ -170,8 +143,19 @@ export default async function Home({
         {/* Campus top pledgers */}
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top pledgers</h2>
-          {(topPledgers[0]?.pledges ?? 0 > 0) ? (
-            <RankingTable rows={topPledgersRows} minRows={10} />
+          {(topPledgers[0]?.score ?? 0 > 0) ? (
+            <RankingTable
+              rows={topPledgers}
+              minRows={10}
+              keyFn={(i) => i.id}
+              description={({ item }) => <Student student={item} />}
+              score={({ item }) => (
+                <>
+                  {item.pledges.toLocaleString()}{" "}
+                  <span className="text-sm">pledges</span>
+                </>
+              )}
+            />
           ) : (
             <span className="text-white/70">None yet. Go get pledges!</span>
           )}

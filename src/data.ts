@@ -327,23 +327,31 @@ export async function loadData(campus: string) {
       fullName(s.firstName, s.lastName),
   }));
 
-  const topReaders = students
-    .slice()
-    .sort(
-      (a, b) =>
-        b.minutes - a.minutes ||
-        b.pledges - a.pledges ||
-        b.displayName.localeCompare(a.displayName),
-    );
+  const topReaders = awardPrizes(
+    10,
+    students
+      .slice()
+      .sort(
+        (a, b) =>
+          b.minutes - a.minutes ||
+          b.pledges - a.pledges ||
+          b.displayName.localeCompare(a.displayName),
+      ),
+    (s) => s.minutes,
+  );
 
-  const topPledgers = students
-    .slice()
-    .sort(
-      (a, b) =>
-        b.pledges - a.pledges ||
-        b.minutes - a.minutes ||
-        b.displayName.localeCompare(a.displayName),
-    );
+  const topPledgers = awardPrizes(
+    5,
+    students
+      .slice()
+      .sort(
+        (a, b) =>
+          b.pledges - a.pledges ||
+          b.minutes - a.minutes ||
+          b.displayName.localeCompare(a.displayName),
+      ),
+    (s) => s.pledges,
+  );
 
   const classes = new Map(
     Array.from(
