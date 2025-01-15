@@ -1,5 +1,5 @@
 export function partition<T>(
-  arr: T[],
+  arr: ReadonlyArray<T>,
   predicate: (item: T) => boolean,
 ): [T[], T[]] {
   const truthy: T[] = [];
@@ -14,7 +14,10 @@ export function partition<T>(
   return [truthy, falsy];
 }
 
-export function groupBy<T, K>(xs: Iterable<T>, k: (item: T) => K): Map<K, T[]> {
+export function groupBy<T, K>(
+  xs: Iterable<T>,
+  k: (item: T) => K,
+): Map<K, Array<T>> {
   const groups = new Map<K, T[]>();
   for (const x of xs) {
     const key = k(x);
