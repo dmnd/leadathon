@@ -55,7 +55,13 @@ export default async function Home({
     getScore,
   );
 
-  const { classesByGrade, topReaders, topPledgers } = await loadData(campus);
+  const {
+    classesByGrade,
+    campusTopReaders,
+    campusTopPledgers,
+    gradeTopReaders,
+    gradeTopPledgers,
+  } = await loadData(campus);
 
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
@@ -94,15 +100,20 @@ export default async function Home({
 
         {/* Grade level competitions */}
         {[...classesByGrade.entries()].sort().map(([league, classes]) => (
-          <ClassBox key={league} classes={classes} />
+          <ClassBox
+            key={league}
+            classes={classes}
+            topReaders={gradeTopReaders.get(league)!}
+            topPledgers={gradeTopPledgers.get(league)!}
+          />
         ))}
 
         {/* Campus top readers */}
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top readers</h2>
-          {(topReaders[0]?.score ?? 0 > 0) ? (
+          {(campusTopReaders[0]?.score ?? 0 > 0) ? (
             <RankingTable
-              rows={topReaders}
+              rows={campusTopReaders}
               minRows={10}
               keyFn={(i) => i.id}
               description={({ item }) => <Student student={item} />}
@@ -120,9 +131,9 @@ export default async function Home({
         {/* Campus top pledgers */}
         <Box>
           <h2 className="text-xl font-bold">{campuses[campus]} top pledgers</h2>
-          {(topPledgers[0]?.score ?? 0 > 0) ? (
+          {(campusTopPledgers[0]?.score ?? 0 > 0) ? (
             <RankingTable
-              rows={topPledgers}
+              rows={campusTopPledgers}
               minRows={10}
               keyFn={(i) => i.id}
               description={({ item }) => <Student student={item} />}

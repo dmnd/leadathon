@@ -327,7 +327,7 @@ export async function loadData(campus: string) {
       fullName(s.firstName, s.lastName),
   }));
 
-  const topReaders = awardPrizes(
+  const campusTopReaders = awardPrizes(
     10,
     students
       .slice()
@@ -340,7 +340,7 @@ export async function loadData(campus: string) {
     (s) => s.minutes,
   );
 
-  const topPledgers = awardPrizes(
+  const campusTopPledgers = awardPrizes(
     5,
     students
       .slice()
@@ -380,7 +380,6 @@ export async function loadData(campus: string) {
   );
 
   const campusClasses = classes.filter((c) => c.campus === campus);
-
   const grouped = groupBy(campusClasses, (c) => `${c.campus}${c.grade}`);
 
   const classesByGrade = new Map(
@@ -401,10 +400,48 @@ export async function loadData(campus: string) {
     ]),
   );
 
+  const gradeTopReaders = new Map(
+    [...classesByGrade.entries()].map(([grade, classes]) => [
+      grade,
+      awardPrizes(
+        5,
+        classes
+          .flatMap(({ item }) => item.students)
+          .sort(
+            (a, b) =>
+              b.minutes - a.minutes ||
+              b.pledges - a.pledges ||
+              a.displayName.localeCompare(b.displayName),
+          ),
+        (s) => s.minutes,
+      ),
+    ]),
+  );
+
+  const gradeTopPledgers = new Map(
+    [...classesByGrade.entries()].map(([grade, classes]) => [
+      grade,
+      awardPrizes(
+        3,
+        classes
+          .flatMap(({ item }) => item.students)
+          .sort(
+            (a, b) =>
+              b.pledges - a.pledges ||
+              b.minutes - a.minutes ||
+              a.displayName.localeCompare(b.displayName),
+          ),
+        (s) => s.pledges,
+      ),
+    ]),
+  );
+
   return {
+    gradeTopReaders,
+    gradeTopPledgers,
     classesByGrade,
-    topReaders,
-    topPledgers,
+    campusTopReaders,
+    campusTopPledgers,
     lastUpdate,
   };
 }

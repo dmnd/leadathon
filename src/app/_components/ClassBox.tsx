@@ -1,4 +1,4 @@
-import type { Class } from "../../types";
+import type { Class, Student } from "../../types";
 import { GradeLabel } from "./GradeLabel";
 import RankingTable from "./RankingTable";
 import { ClockIcon } from "./ClockIcon";
@@ -6,40 +6,17 @@ import GradeRankingTable from "./GradeRankingTable";
 import { Box } from "./Box";
 import { Minutes } from "./Minutes";
 import { pluralize } from "~/string";
-import { awardPrizes, type CompetitionRank } from "~/data";
+import { type CompetitionRank } from "~/data";
 
 export default function ClassBox({
   classes,
+  topReaders,
+  topPledgers,
 }: {
   classes: Array<CompetitionRank<Class>>;
+  topReaders: Array<CompetitionRank<Student>>;
+  topPledgers: Array<CompetitionRank<Student>>;
 }) {
-  const topReaders = awardPrizes(
-    5,
-    classes
-      .flatMap((c) => c.item.students)
-      .sort(
-        (a, b) =>
-          b.minutes - a.minutes ||
-          b.pledges - a.pledges ||
-          a.displayName.localeCompare(b.displayName),
-      ),
-    (s) => s.minutes,
-  );
-
-  const topPledgers = awardPrizes(
-    3,
-    classes
-      .flatMap((c) => c.item.students)
-      .sort(
-        (a, b) =>
-          b.pledges - a.pledges ||
-          b.minutes - a.minutes ||
-          a.displayName.localeCompare(b.displayName),
-      )
-      .filter((s) => s.pledges > 0),
-    (s) => s.pledges,
-  );
-
   return (
     <Box className="row-span-2">
       <h2 className="text-xl font-bold">
