@@ -3,13 +3,15 @@ import { ClockIcon } from "~/app/_components/ClockIcon";
 import { GradeLabel } from "~/app/_components/GradeLabel";
 import GradeRankingTable from "~/app/_components/GradeRankingTable";
 import { Minutes } from "~/app/_components/Minutes";
-import DeprecatedRankingTable from "~/app/_components/DeprecatedRankingTable";
-import { className, loadData } from "~/data";
-import { humanize } from "~/string";
+import RankingTable from "~/app/_components/RankingTable";
+import { awardPrizes, className, loadData } from "~/data";
+import { humanize, pluralize } from "~/string";
 import { type Campus, campuses } from "~/types";
 import { Box } from "../../../_components/Box";
 import { notFound } from "next/navigation";
 import Footer from "~/app/_components/Footer";
+import Tippy from "~/app/_components/Tippy";
+import PledgeIcon from "~/app/_components/PledgeIcon";
 
 export default async function Animal({
   params,
@@ -36,6 +38,18 @@ export default async function Animal({
   if (room == null) {
     return notFound();
   }
+
+  const classTopReaders = awardPrizes(3, room.item.students, (s) => s.minutes);
+  const classTopPledgers = awardPrizes(
+    1,
+    room.item.students.sort(
+      (a, b) =>
+        b.pledges - a.pledges ||
+        b.minutes - a.minutes ||
+        a.displayName.localeCompare(b.displayName),
+    ),
+    (s) => s.pledges,
+  ).filter(({ rank }) => rank === 1);
 
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
@@ -104,22 +118,31 @@ export default async function Animal({
           <h2 className="text-xl font-bold">
             {humanize(animal)} class readers
           </h2>
-          {(room.item.students[0]?.minutes ?? 0 > 0) ? (
-            <DeprecatedRankingTable
-              showPledges
-              rows={room.item.students.map((s) => ({
-                key: s.id,
-                contents: s.displayName,
-                scoreCell: (
-                  <>
-                    <ClockIcon /> <Minutes minutes={s.minutes} />
-                  </>
-                ),
-                pledges: s.pledges,
-                score: s.minutes,
-              }))}
-              awards={3}
-              targetRows={room.item.students.length}
+          {(classTopReaders[0]?.score ?? 0 > 0) ? (
+            <RankingTable
+              rows={classTopReaders}
+              minRows={classTopReaders.length}
+              keyFn={(s) => s.id}
+              description={({ item }) => item.displayName}
+              score={({ item }) => (
+                <>
+                  <ClockIcon /> <Minutes minutes={item.minutes} />
+                </>
+              )}
+              extra={({ item }) =>
+                classTopPledgers.find(
+                  ({ item: pledgingItem }) => item.id === pledgingItem.id,
+                ) ? (
+                  <Tippy
+                    content={`Pledge leader (${item.pledges} ${pluralize("pledge", item.pledges)})`}
+                    delay={0}
+                    animation={false}
+                    placement="right"
+                  >
+                    <PledgeIcon />
+                  </Tippy>
+                ) : null
+              }
             />
           ) : (
             <span className="text-white/70">None yet. Log your reading!</span>
