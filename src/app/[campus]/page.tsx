@@ -55,30 +55,7 @@ export default async function Home({
     getScore,
   );
 
-  const {
-    classes: campusClasses,
-    topReaders,
-    topPledgers,
-  } = await loadData(campus);
-
-  const gradeLeagues = groupBy(
-    campusClasses.values(),
-    (c) => `${c.campus}${c.grade}`,
-  );
-
-  const minutesGradeLeagues = new Map(
-    Array.from(gradeLeagues.entries()).map(([league, classes]) => [
-      league,
-      classes
-        .slice()
-        .sort(
-          (a, b) =>
-            b.minutes - a.minutes ||
-            b.pledges - a.pledges ||
-            a.animal.localeCompare(b.animal),
-        ),
-    ]),
-  );
+  const { classesByGrade, topReaders, topPledgers } = await loadData(campus);
 
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
@@ -116,7 +93,7 @@ export default async function Home({
         </Box>
 
         {/* Grade level competitions */}
-        {[...minutesGradeLeagues.entries()].sort().map(([league, classes]) => (
+        {[...classesByGrade.entries()].sort().map(([league, classes]) => (
           <ClassBox key={league} classes={classes} />
         ))}
 
@@ -180,7 +157,8 @@ export default async function Home({
 
           {/* Race lanes */}
           <div className="flex flex-col gap-2">
-            {Array.from(campusClasses.values())
+            {[...classesByGrade.values()]
+              .flat()
               .sort(
                 (a, b) => a.grade - b.grade || a.animal.localeCompare(b.animal),
               )

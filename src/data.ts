@@ -353,37 +353,52 @@ export async function loadData(campus: string) {
     (s) => s.pledges,
   );
 
-  const classes = new Map(
-    Array.from(
-      groupBy(students.values(), className).entries(),
-      ([className, students]) => {
-        const teacher = teachers[className];
-        if (teacher == null) {
-          console.warn(`No teacher found for ${className}`);
-        }
-        return [
-          className,
-          {
-            students,
-            teacher,
-            className,
-            grade: students[0]!.grade,
-            campus: students[0]!.campus,
-            animal: students[0]!.animal,
-            pledges: students.reduce((x, s) => x + s.pledges, 0),
-            minutes: students.reduce((x, s) => x + s.minutes, 0),
-          },
-        ];
-      },
+  const classes = Array.from(
+    groupBy(students.values(), className).entries(),
+    ([className, students]) => {
+      const teacher = teachers[className];
+      if (teacher == null) {
+        console.warn(`No teacher found for ${className}`);
+      }
+      students.sort(
+        (a, b) =>
+          b.minutes - a.minutes ||
+          b.pledges - a.pledges ||
+          a.displayName.localeCompare(b.displayName),
+      );
+      return {
+        students,
+        teacher,
+        className,
+        grade: students[0]!.grade,
+        campus: students[0]!.campus,
+        animal: students[0]!.animal,
+        pledges: students.reduce((x, s) => x + s.pledges, 0),
+        minutes: students.reduce((x, s) => x + s.minutes, 0),
+      };
+    },
+  );
+
+  const campusClasses = classes.filter((c) => c.campus === campus);
+
+  const classesByGrade = new Map(
+    [...groupBy(campusClasses, (c) => `${c.campus}${c.grade}`).entries()].map(
+      ([league, classes]) => [
+        league,
+        classes
+          .slice()
+          .sort(
+            (a, b) =>
+              b.minutes - a.minutes ||
+              b.pledges - a.pledges ||
+              a.animal.localeCompare(b.animal),
+          ),
+      ],
     ),
   );
 
-  const campusClasses = new Map(
-    Array.from(classes.entries()).filter(([_, c]) => c.campus === campus),
-  );
-
   return {
-    classes: campusClasses,
+    classesByGrade,
     topReaders,
     topPledgers,
     lastUpdate,
