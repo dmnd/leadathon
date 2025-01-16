@@ -32,12 +32,10 @@ export default async function Animal({
     return notFound();
   }
 
-  const classroom = gradeClasses.find((c) => c.animal === animal);
-  if (classroom == null) {
+  const room = gradeClasses.find((c) => c.item.animal === animal);
+  if (room == null) {
     return notFound();
   }
-
-  const position = gradeClasses.findIndex((c) => c === classroom) + 1;
 
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
@@ -63,7 +61,7 @@ export default async function Animal({
           Back to Yu Ming {campuses[campus]} campus
         </Link>
         <h1 className="text-5xl font-extrabold capitalize tracking-tight">
-          {classroom.teacher}&apos;s {humanize(classroom.animal)} class
+          {room.item.teacher}&apos;s {humanize(room.item.animal)} class
         </h1>
       </div>
 
@@ -73,10 +71,10 @@ export default async function Animal({
             <div
               className="relative"
               style={{
-                left: `${Math.min(80, (classroom.pledges / 80) * 100)}%`,
+                left: `${Math.min(80, (room.item.pledges / 80) * 100)}%`,
               }}
             >
-              {classroom.pledges.toLocaleString()} pledges
+              {room.item.pledges.toLocaleString()} pledges
             </div>
             <div>80</div>
           </div>
@@ -88,7 +86,7 @@ export default async function Animal({
               <div
                 className="h-full bg-yellow-300 transition-all"
                 style={{
-                  width: `${Math.min(100, (classroom.pledges / 80) * 100)}%`,
+                  width: `${Math.min(100, (room.item.pledges / 80) * 100)}%`,
                 }}
               />
             </div>
@@ -97,7 +95,7 @@ export default async function Animal({
 
         <Box>
           <h2 className="text-xl font-bold">
-            Ranked #{position} in <GradeLabel grade={grade} long />
+            Ranked #{room.rank} in <GradeLabel grade={grade} long />
           </h2>
           <GradeRankingTable viewer={classroomName} classes={gradeClasses} />
         </Box>
@@ -106,10 +104,10 @@ export default async function Animal({
           <h2 className="text-xl font-bold">
             {humanize(animal)} class readers
           </h2>
-          {(classroom.students[0]?.minutes ?? 0 > 0) ? (
+          {(room.item.students[0]?.minutes ?? 0 > 0) ? (
             <DeprecatedRankingTable
               showPledges
-              rows={classroom.students.map((s) => ({
+              rows={room.item.students.map((s) => ({
                 key: s.id,
                 contents: s.displayName,
                 scoreCell: (
@@ -121,7 +119,7 @@ export default async function Animal({
                 score: s.minutes,
               }))}
               awards={3}
-              targetRows={classroom.students.length}
+              targetRows={room.item.students.length}
             />
           ) : (
             <span className="text-white/70">None yet. Log your reading!</span>

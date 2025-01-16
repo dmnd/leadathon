@@ -4,7 +4,7 @@ import { ClockIcon } from "./ClockIcon";
 import type { Class } from "../../types";
 import { humanize } from "~/string";
 import { Minutes } from "./Minutes";
-import { awardPrizes } from "~/data";
+import { type CompetitionRank } from "~/data";
 
 function toURL(c: Class) {
   return `/${c.campus.toLowerCase()}/${
@@ -16,14 +16,13 @@ export default function GradeRankingTable({
   classes,
   viewer,
 }: {
-  classes: Array<Class>;
+  classes: Array<CompetitionRank<Class>>;
   viewer?: string;
 }) {
-  const rows = awardPrizes(1, classes, (c) => c.minutes);
   return (
     <RankingTable
-      rows={rows}
-      minRows={rows.length}
+      rows={classes}
+      minRows={classes.length}
       keyFn={(x) => x.className}
       highlight={({ item: { className } }) => className === viewer}
       description={({ item }) => (

@@ -381,10 +381,13 @@ export async function loadData(campus: string) {
 
   const campusClasses = classes.filter((c) => c.campus === campus);
 
+  const grouped = groupBy(campusClasses, (c) => `${c.campus}${c.grade}`);
+
   const classesByGrade = new Map(
-    [...groupBy(campusClasses, (c) => `${c.campus}${c.grade}`).entries()].map(
-      ([league, classes]) => [
-        league,
+    [...grouped.entries()].map(([league, classes]) => [
+      league,
+      awardPrizes(
+        1,
         classes
           .slice()
           .sort(
@@ -393,8 +396,9 @@ export async function loadData(campus: string) {
               b.pledges - a.pledges ||
               a.animal.localeCompare(b.animal),
           ),
-      ],
-    ),
+        (c) => c.minutes,
+      ),
+    ]),
   );
 
   return {

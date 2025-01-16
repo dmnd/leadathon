@@ -160,18 +160,15 @@ export default async function Home({
             {[...classesByGrade.values()]
               .flat()
               .sort(
-                (a, b) => a.grade - b.grade || a.animal.localeCompare(b.animal),
+                ({ item: a }, { item: b }) =>
+                  a.grade - b.grade || a.animal.localeCompare(b.animal),
               )
               .map((classroom) => {
-                const pledges = classroom.students.reduce(
-                  (acc, s) => acc + s.pledges,
-                  0,
-                );
-
+                const { pledges, animal } = classroom.item;
                 const progress = Math.min(100, (pledges / 80) * 100);
 
                 return (
-                  <div key={classroom.animal} className="relative h-8">
+                  <div key={classroom.item.animal} className="relative h-8">
                     {/* Lane background */}
                     <div className="absolute h-full w-full rounded bg-white/5" />
 
@@ -195,21 +192,19 @@ export default async function Home({
                         color: "black",
                       }}
                     >
-                      <span className="text-sm font-bold">
-                        {classroom.pledges}
-                      </span>
+                      <span className="text-sm font-bold">{pledges}</span>
                     </div>
 
                     {/* Labels */}
                     {progress > 10 ? (
                       <div className="absolute left-2 top-1/2 -translate-y-1/2 text-lg font-bold uppercase text-white/40">
-                        {humanize(classroom.animal)}
+                        {humanize(animal)}
                       </div>
                     ) : null}
 
                     {progress < 90 ? (
                       <div className="absolute right-7 top-1/2 -translate-y-1/2 text-lg font-bold uppercase text-white/40">
-                        {humanize(classroom.animal)}
+                        {humanize(animal)}
                       </div>
                     ) : null}
                   </div>

@@ -6,13 +6,17 @@ import GradeRankingTable from "./GradeRankingTable";
 import { Box } from "./Box";
 import { Minutes } from "./Minutes";
 import { pluralize } from "~/string";
-import { awardPrizes } from "~/data";
+import { awardPrizes, type CompetitionRank } from "~/data";
 
-export default function ClassBox({ classes }: { classes: Array<Class> }) {
+export default function ClassBox({
+  classes,
+}: {
+  classes: Array<CompetitionRank<Class>>;
+}) {
   const topReaders = awardPrizes(
     5,
     classes
-      .flatMap((c) => c.students)
+      .flatMap((c) => c.item.students)
       .sort(
         (a, b) =>
           b.minutes - a.minutes ||
@@ -25,7 +29,7 @@ export default function ClassBox({ classes }: { classes: Array<Class> }) {
   const topPledgers = awardPrizes(
     3,
     classes
-      .flatMap((c) => c.students)
+      .flatMap((c) => c.item.students)
       .sort(
         (a, b) =>
           b.pledges - a.pledges ||
@@ -39,7 +43,7 @@ export default function ClassBox({ classes }: { classes: Array<Class> }) {
   return (
     <Box className="row-span-2">
       <h2 className="text-xl font-bold">
-        <GradeLabel grade={classes[0]!.grade} long /> rankings
+        <GradeLabel grade={classes[0]!.item.grade} long /> rankings
       </h2>
       <GradeRankingTable classes={classes} />
 
