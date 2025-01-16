@@ -4,7 +4,7 @@ import { GradeLabel } from "~/app/_components/GradeLabel";
 import GradeRankingTable from "~/app/_components/GradeRankingTable";
 import { Minutes } from "~/app/_components/Minutes";
 import RankingTable from "~/app/_components/RankingTable";
-import { awardPrizes, className, loadData } from "~/data";
+import { className, loadData } from "~/data";
 import { humanize, pluralize } from "~/string";
 import { type Campus, campuses } from "~/types";
 import { Box } from "../../../_components/Box";
@@ -28,7 +28,9 @@ export default async function Animal({
   const { animal } = await params;
   const classroomName = className({ grade, animal, campus });
 
-  const { classesByGrade, lastUpdate } = await loadData(campus);
+  const { classesByGrade, classTopReaders, classTopPledgers, lastUpdate } =
+    await loadData(campus);
+
   const gradeClasses = classesByGrade.get(`${campus}${grade}`);
   if (gradeClasses == null) {
     return notFound();
@@ -39,17 +41,17 @@ export default async function Animal({
     return notFound();
   }
 
-  const classTopReaders = awardPrizes(3, room.item.students, (s) => s.minutes);
-  const classTopPledgers = awardPrizes(
-    1,
-    room.item.students.sort(
-      (a, b) =>
-        b.pledges - a.pledges ||
-        b.minutes - a.minutes ||
-        a.displayName.localeCompare(b.displayName),
-    ),
-    (s) => s.pledges,
-  ).filter(({ rank }) => rank === 1);
+  const topReaders = classTopReaders.get(classroomName);
+  if (topReaders == null) {
+    return notFound();
+  }
+
+  const topPledgers = classTopPledgers
+    .get(classroomName)
+    ?.filter((r) => r.rank === 1);
+  if (topPledgers == null) {
+    return notFound();
+  }
 
   return (
     <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
@@ -118,10 +120,10 @@ export default async function Animal({
           <h2 className="text-xl font-bold">
             {humanize(animal)} class readers
           </h2>
-          {(classTopReaders[0]?.score ?? 0 > 0) ? (
+          {(topReaders[0]?.score ?? 0 > 0) ? (
             <RankingTable
-              rows={classTopReaders}
-              minRows={classTopReaders.length}
+              rows={topReaders}
+              minRows={topReaders.length}
               keyFn={(s) => s.id}
               description={({ item }) => item.displayName}
               score={({ item }) => (
@@ -130,7 +132,7 @@ export default async function Animal({
                 </>
               )}
               extra={({ item }) =>
-                classTopPledgers.find(
+                topPledgers.find(
                   ({ item: pledgingItem }) => item.id === pledgingItem.id,
                 ) ? (
                   <Tippy

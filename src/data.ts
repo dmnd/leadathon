@@ -289,11 +289,6 @@ export async function loadStudents() {
     ];
   });
 
-  console.log(
-    "dmndst",
-    students.filter((s) => s.lastName === "Ramirez"),
-  );
-
   // merge duplicates
   const uniqStudents = new Map<string, (typeof students)[number]>();
   for (const s of students) {
@@ -310,6 +305,26 @@ export async function loadStudents() {
     }
   }
   return { students: [...uniqStudents.values()], lastUpdate };
+}
+
+type Sortable = Readonly<{
+  minutes: number;
+  pledges: number;
+  displayName: string;
+}>;
+function byReadingComparator(a: Sortable, b: Sortable) {
+  return (
+    b.minutes - a.minutes ||
+    b.pledges - a.pledges ||
+    a.displayName.localeCompare(b.displayName)
+  );
+}
+function byPledgingComparator(a: Sortable, b: Sortable) {
+  return (
+    b.pledges - a.pledges ||
+    b.minutes - a.minutes ||
+    a.displayName.localeCompare(b.displayName)
+  );
 }
 
 export async function loadData(campus: string) {
@@ -329,27 +344,13 @@ export async function loadData(campus: string) {
 
   const campusTopReaders = awardPrizes(
     10,
-    students
-      .slice()
-      .sort(
-        (a, b) =>
-          b.minutes - a.minutes ||
-          b.pledges - a.pledges ||
-          b.displayName.localeCompare(a.displayName),
-      ),
+    students.slice().sort(byReadingComparator),
     (s) => s.minutes,
   );
 
   const campusTopPledgers = awardPrizes(
     5,
-    students
-      .slice()
-      .sort(
-        (a, b) =>
-          b.pledges - a.pledges ||
-          b.minutes - a.minutes ||
-          b.displayName.localeCompare(a.displayName),
-      ),
+    students.slice().sort(byPledgingComparator),
     (s) => s.pledges,
   );
 
@@ -360,12 +361,7 @@ export async function loadData(campus: string) {
       if (teacher == null) {
         console.warn(`No teacher found for ${className}`);
       }
-      students.sort(
-        (a, b) =>
-          b.minutes - a.minutes ||
-          b.pledges - a.pledges ||
-          a.displayName.localeCompare(b.displayName),
-      );
+      students.sort(byReadingComparator);
       return {
         students,
         teacher,
@@ -373,6 +369,7 @@ export async function loadData(campus: string) {
         grade: students[0]!.grade,
         campus: students[0]!.campus,
         animal: students[0]!.animal,
+        displayName: className,
         pledges: students.reduce((x, s) => x + s.pledges, 0),
         minutes: students.reduce((x, s) => x + s.minutes, 0),
       };
@@ -387,14 +384,7 @@ export async function loadData(campus: string) {
       league,
       awardPrizes(
         1,
-        classes
-          .slice()
-          .sort(
-            (a, b) =>
-              b.minutes - a.minutes ||
-              b.pledges - a.pledges ||
-              a.animal.localeCompare(b.animal),
-          ),
+        classes.slice().sort(byReadingComparator),
         (c) => c.minutes,
       ),
     ]),
@@ -405,14 +395,7 @@ export async function loadData(campus: string) {
       grade,
       awardPrizes(
         5,
-        classes
-          .flatMap(({ item }) => item.students)
-          .sort(
-            (a, b) =>
-              b.minutes - a.minutes ||
-              b.pledges - a.pledges ||
-              a.displayName.localeCompare(b.displayName),
-          ),
+        classes.flatMap(({ item }) => item.students).sort(byReadingComparator),
         (s) => s.minutes,
       ),
     ]),
@@ -423,25 +406,42 @@ export async function loadData(campus: string) {
       grade,
       awardPrizes(
         3,
-        classes
-          .flatMap(({ item }) => item.students)
-          .sort(
-            (a, b) =>
-              b.pledges - a.pledges ||
-              b.minutes - a.minutes ||
-              a.displayName.localeCompare(b.displayName),
-          ),
+        classes.flatMap(({ item }) => item.students).sort(byPledgingComparator),
+        (s) => s.pledges,
+      ),
+    ]),
+  );
+
+  const classTopReaders = new Map(
+    campusClasses.map((classroom) => [
+      classroom.className,
+      awardPrizes(
+        3,
+        classroom.students.slice().sort(byReadingComparator),
+        (s) => s.minutes,
+      ),
+    ]),
+  );
+
+  const classTopPledgers = new Map(
+    campusClasses.map((classroom) => [
+      classroom.className,
+      awardPrizes(
+        1,
+        classroom.students.slice().sort(byPledgingComparator),
         (s) => s.pledges,
       ),
     ]),
   );
 
   return {
+    classTopReaders,
+    classTopPledgers,
     gradeTopReaders,
     gradeTopPledgers,
-    classesByGrade,
     campusTopReaders,
     campusTopPledgers,
+    classesByGrade,
     lastUpdate,
   };
 }
