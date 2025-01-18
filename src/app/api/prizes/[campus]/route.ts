@@ -16,7 +16,7 @@ export async function GET(
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv",
-      "Content-Disposition": 'attachment; filename="prizes.csv"',
+      "Content-Disposition": `attachment; filename="prizes-${campus}.csv"`,
     },
   });
 }
