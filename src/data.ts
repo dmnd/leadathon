@@ -202,7 +202,7 @@ export async function loadStudents() {
     badClasses,
   );
 
-  const students = rawStudents.flatMap((s) => {
+  const allStudents = rawStudents.flatMap((s) => {
     const firstName = cleanupName(s["First Name"]);
     const lastName = cleanupName(s["Last Name"]);
 
@@ -290,8 +290,8 @@ export async function loadStudents() {
   });
 
   // merge duplicates
-  const uniqStudents = new Map<string, (typeof students)[number]>();
-  for (const s of students) {
+  const uniqStudents = new Map<string, (typeof allStudents)[number]>();
+  for (const s of allStudents) {
     const existing = uniqStudents.get(s.id);
     if (existing != null) {
       existing._pledgesOnline += s._pledgesOnline;
@@ -304,7 +304,29 @@ export async function loadStudents() {
       uniqStudents.set(s.id, s);
     }
   }
-  return { students: [...uniqStudents.values()], lastUpdate };
+
+  const students = [...uniqStudents.values()];
+
+  // TODO: awardPrizes should sort items itself
+  const getScore = (c: { pledges: number; classes: number }) =>
+    c.pledges / c.classes;
+  const topCampuses = awardPrizes(
+    0,
+    [...groupBy(students, (s) => s.campus).entries()]
+      .map(([campus, students]) => ({
+        campus,
+        minutes: students.reduce((a, s) => a + s.minutes, 0),
+        pledges: students.reduce((a, s) => a + s.pledges, 0),
+        raised: students.reduce((a, s) => a + s.expectedRaised, 0),
+        classes: new Set(students.map((s) => s.animal)).size, // TODO: include nonparticipating classes
+      }))
+      .sort(
+        (a, b) => getScore(b) - getScore(a) || a.campus.localeCompare(b.campus),
+      ),
+    getScore,
+  );
+
+  return { topCampuses, students, lastUpdate };
 }
 
 type Sortable = Readonly<{
@@ -453,7 +475,7 @@ export type CompetitionRank<T> = {
   prize: boolean;
 };
 
-export function awardPrizes<T>(
+function awardPrizes<T>(
   prizes: number,
   items: Array<T>,
   f: (row: T) => number,
@@ -482,4 +504,67 @@ export function awardPrizes<T>(
     });
   }
   return ranks;
+}
+
+import { type Student } from "./types";
+
+export async function exportCSV(campus: Campus) {
+  const {
+    campusTopReaders,
+    campusTopPledgers,
+    gradeTopReaders,
+    gradeTopPledgers,
+    classTopReaders,
+    classTopPledgers,
+  } = await loadData(campus);
+
+  const competitions: Array<[string, Array<CompetitionRank<Student>>]> = [
+    ["Campus Top Reader", campusTopReaders],
+    ["Campus Top Pledger", campusTopPledgers],
+  ];
+
+  const moreComps = [
+    ["Grade Top Reader", gradeTopReaders],
+    ["Grade Top Pledger", gradeTopPledgers],
+    ["Class Top Reader", classTopReaders],
+    ["Class Top Pledger", classTopPledgers],
+  ] as const;
+
+  for (const [title, comp] of moreComps) {
+    for (const x of comp.values()) {
+      competitions.push([title, x]);
+    }
+  }
+
+  const result = competitions.flatMap(([title, results]) =>
+    results
+      .filter((r) => r.prize)
+      .map((r) =>
+        [
+          r.item.campus,
+          r.item.grade,
+          r.item.animal,
+          title,
+          r.rank,
+          r.score,
+          r.item.lastName,
+          r.item.firstName,
+        ].join(","),
+      ),
+  );
+
+  result.unshift(
+    [
+      "Campus",
+      "Grade",
+      "Class",
+      "Competition",
+      "Rank",
+      "Score",
+      "Last name",
+      "First name",
+    ].join(","),
+  );
+
+  return result.join("\n");
 }

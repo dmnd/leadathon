@@ -1,12 +1,11 @@
 import CampusSelector from "~/app/_components/CampusSelector";
 import ClassBox from "~/app/_components/ClassBox";
-import { awardPrizes, loadData, loadStudents } from "~/data";
+import { loadData, loadStudents } from "~/data";
 import { type Campus, campuses, type Student } from "~/types";
 import { ClockIcon } from "../_components/ClockIcon";
 import { Box } from "../_components/Box";
 import { Minutes } from "../_components/Minutes";
 import { notFound } from "next/navigation";
-import { groupBy } from "~/array";
 import { humanize } from "~/string";
 import Link from "next/link";
 import { GradeLabel } from "../_components/GradeLabel";
@@ -34,26 +33,7 @@ export default async function Home({
     return notFound();
   }
 
-  const { students, lastUpdate } = await loadStudents();
-
-  // TODO: awardPrizes should sort items itself
-  const getScore = (c: { pledges: number; classes: number }) =>
-    c.pledges / c.classes;
-  const topCampuses = awardPrizes(
-    0,
-    [...groupBy(students, (s) => s.campus).entries()]
-      .map(([campus, students]) => ({
-        campus,
-        minutes: students.reduce((a, s) => a + s.minutes, 0),
-        pledges: students.reduce((a, s) => a + s.pledges, 0),
-        raised: students.reduce((a, s) => a + s.expectedRaised, 0),
-        classes: new Set(students.map((s) => s.animal)).size, // TODO: include nonparticipating classes
-      }))
-      .sort(
-        (a, b) => getScore(b) - getScore(a) || a.campus.localeCompare(b.campus),
-      ),
-    getScore,
-  );
+  const { topCampuses, lastUpdate } = await loadStudents();
 
   const {
     classesByGrade,

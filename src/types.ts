@@ -20,6 +20,8 @@ export type Row = {
 
 export type Student = {
   displayName: string;
+  firstName: string;
+  lastName: string;
   _raw: Array<Row>;
   id: string;
   campus: Campus;
