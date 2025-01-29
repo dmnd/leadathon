@@ -207,13 +207,17 @@ export async function loadStudents() {
     const lastName = cleanupName(s["Last Name"]);
 
     const pledgestarClass = s["Class Name"]?.split(/[\s,]+/)[0] ?? "";
-    const rosterClasses =
-      roster.get(rosterName(firstName, lastName)) ?? new Set();
+    let rosterKey = rosterName(firstName, lastName);
+    // TODO: better way to match nickname / fullname discrepancies
+    if (rosterKey === "finn|shau coldwell") {
+      rosterKey = "finnegan|coldwell";
+    }
+    const rosterClasses = roster.get(rosterKey) ?? new Set();
 
     let classroom = pledgestarClass;
     let movedFrom: string | null = null;
     if (rosterClasses.size === 0) {
-      // console.warn(`${rosterName(firstName, lastName)} not found in roster`);
+      // console.warn(`${rosterKey} not found in roster`);
       // TODO: investigate these
     } else if (rosterClasses.size > 1) {
       // There are kids with the same name!
