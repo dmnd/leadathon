@@ -48,6 +48,7 @@ export const campuses = {
   CAR: "Carolyn",
   CHE: "Chestnut",
   MLK: "MLK",
+  ADE: "Adeline",
 } as const;
 
 export type Campus = keyof typeof campuses;
