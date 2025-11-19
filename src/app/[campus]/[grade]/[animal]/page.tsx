@@ -24,7 +24,8 @@ export default async function Animal({
   }
 
   const rawGrade = (await params).grade.toLowerCase();
-  const grade = rawGrade === "k" ? 0 : Number.parseInt(rawGrade);
+  const grade =
+    rawGrade === "k" ? 0 : rawGrade === "t" ? -1 : Number.parseInt(rawGrade);
   const { animal } = await params;
   const classroomName = className({ grade, animal, campus });
 

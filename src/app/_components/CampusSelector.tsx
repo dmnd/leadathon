@@ -22,6 +22,9 @@ export default function CampusSelector({ campus }: { campus: string }) {
       <option className="text-black" value="MLK">
         {campuses.MLK}
       </option>
+      <option className="text-black" value="ADE">
+        {campuses.ADE}
+      </option>
     </select>
   );
 }

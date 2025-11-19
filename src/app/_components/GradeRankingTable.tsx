@@ -7,9 +7,14 @@ import { Minutes } from "./Minutes";
 import { type CompetitionRank } from "~/data";
 
 function toURL(c: Class) {
-  return `/${c.campus.toLowerCase()}/${
-    c.grade === 0 ? "k" : c.grade.toString().toLowerCase()
-  }/${c.animal}`;
+  const gradeSegment =
+    c.grade === 0
+      ? "k"
+      : c.grade === -1
+        ? "t"
+        : c.grade.toString().toLowerCase();
+
+  return `/${c.campus.toLowerCase()}/${gradeSegment}/${c.animal}`;
 }
 
 export default function GradeRankingTable({

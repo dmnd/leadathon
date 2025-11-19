@@ -11,41 +11,49 @@ import { DateTime } from "luxon";
 
 const teachers: Record<string, string> = {
   "1MonkeyCAR": "Jin Ruoxi",
-  "1TigerCAR": "Zhou Jing",
+  "1TigerCAR": "Cui Wenyue",
   "1ZebraCAR": "Xie Jing",
   "2HorseCAR": "Yu Zhikai",
-  "2LionCAR": "Teng Qiong",
-  "2OwlCAR": "Liu Xi",
-  KKoalaCAR: "Guo Qiaoling",
-  KPandaCAR: "Luo Qianying",
-  KPenguinCAR: "Cai Yuanxi",
-  "1MonkeyCHE": "Wen Alin",
+  "2LionCAR": "Yan Wenjing",
+  "2OwlCAR": "Luo Qianying",
+  KKoalaCAR: "Zhang Ailing",
+  KPandaCAR: "Cathy Li",
+  KPenguinCAR: "Cai Lili",
+  "1MonkeyCHE": "Emily Lu",
   "1TigerCHE": "Liao Yiran",
   "1ZebraCHE": "Fang Yiwei",
-  "2HorseCHE": "Emily Lu",
+  "2HorseCHE": "Wen Alin",
   "2LionCHE": "Yu Zecong",
-  "2OwlCHE": "Shi Longping",
-  "3DogCHE": "Liu Lian",
+  "2OwlCHE": "Wendy Wei",
+  "3DogCHE": "Su Wen",
   "3PeacockCHE": "Cheng Mengting",
-  "3PhoenixCHE": "Zhu Fengjiao",
+  "3PhoenixCHE": "Tsai, Jin",
   "3RabbitCHE": "Erin Yi",
   "3SeaHorseCHE": "Bai Shaojun",
   "3SeaLionCHE": "Luo Minyu",
-  KKoalaCHE: "Zhang Jiayin",
+  "4DolphinCHE": "Liu Lian",
+  "4SeaTurtleCHE": "Jiang Ningxin",
+  TSeaOtterCHE: "Chen Xiaoting",
+  KKoalaCHE: "Victoria Ma",
   KPandaCHE: "Yang Huize",
   KPenguinCHE: "Zhang Jiaxin",
+  "3DogADE": "Erin Yi",
+  "3PhoenixADE": "Bella Chen",
+  "3SeaHorseADE": "Cheng Mengting",
+  "4DolphinADE": "Kevin Liu",
+  "4QilinADE": "Tang Yaxing",
   "4DolphinMLK": "Nie Shanshan",
   "4QilinMLK": "Tang Yaxing",
   "4SeaTurtleMLK": "Jiang Ningxin",
-  "5ElephantMLK": "Liu Yu",
-  "5GiraffeMLK": "Chen Jaoling",
+  "5ElephantMLK": "Pat Low",
+  "5GiraffeMLK": "Weng Cheng",
   "5RhinoMLK": "Tascian Ani",
   "6CraneMLK": "Hui Yue",
   "6LeopardMLK": "Louis Wu",
   "7BearMLK": "Shao Yun",
-  "7FalconMLK": "Jennifer Lee",
-  "8PantherMLK": "Xiao Wenjing",
-  "8SharkMLK": "Weng Cheng",
+  "7FalconMLK": "Ryan Mulcahy",
+  "8PantherMLK": "Nie Shanshan",
+  "8SharkMLK": "Jennifer Lee",
 };
 
 export function className(x: {
@@ -53,7 +61,10 @@ export function className(x: {
   grade: number;
   animal: string;
 }) {
-  return `${x.grade === 0 ? "K" : x.grade}${pascalify(x.animal)}${x.campus.toUpperCase()}`;
+  const gradePrefix =
+    x.grade === 0 ? "K" : x.grade === -1 ? "T" : x.grade.toString();
+
+  return `${gradePrefix}${pascalify(x.animal)}${x.campus.toUpperCase()}`;
 }
 
 const regex = new RegExp(/^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)(\d\d)\.csv$/);
@@ -268,7 +279,8 @@ export async function loadStudents() {
 
     invariant(animal != null);
     invariant(rawGrade != null);
-    const grade = rawGrade === "K" ? 0 : Number.parseInt(rawGrade);
+    const grade =
+      rawGrade === "K" ? 0 : rawGrade === "T" ? -1 : Number.parseInt(rawGrade);
 
     const pledgesOnline =
       s["Online Donation #"] + s["Potential Online Donation #"];

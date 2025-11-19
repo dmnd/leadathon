@@ -19,6 +19,8 @@ export function GradeLabel({
   if (long) {
     if (grade === 0) {
       return <>Kindergarten</>;
+    } else if (grade === -1) {
+      return <>TK</>;
     } else {
       return (
         <>
@@ -31,7 +33,7 @@ export function GradeLabel({
 
   return (
     <>
-      {grade === 0 ? "K" : grade}
+      {grade === -1 ? "TK" : grade === 0 ? "K" : grade}
       <sup>{ordinal}</sup>
     </>
   );
