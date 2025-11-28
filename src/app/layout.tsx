@@ -7,7 +7,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
-  title: "Readathon 2024! at Yu Ming Charter School",
+  title: "Readathon 2025! at Yu Ming Charter School",
   description: "Read, pledge and win!",
   icons: [
     {
