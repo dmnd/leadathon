@@ -99,62 +99,20 @@ async function parseCSV(): Promise<[Papa.ParseResult<Row>, string]> {
       dynamicTyping: true,
       error: reject,
       complete: function (results) {
+        // Discard summary/footer rows that begin with "Total" in the
+        // "Last Name" column (these are aggregate rows from the export).
+        results.data = results.data.filter(
+          (r) => String((r["Last Name"] ?? "")).trim().toLowerCase() !== "total",
+        );
         resolve([results, lastUpdate]);
       },
     });
   });
 }
 
-function cleanupClassName(s: string) {
-  return s
-    .replace(
-      /[A-Z]$/,
-      (c) =>
-        ({
-          A: "CHE",
-          M: "MLK",
-          C: "CAR",
-        })[c]!,
-    )
-    .replace("4SeaTurtlMLK", "4SeaTurtleMLK");
-}
-
-function rosterName(first: string, last: string) {
-  return `${first.toLowerCase()}|${last.toLowerCase()}`;
-}
-
-function parseRoster(): Promise<Map<string, Set<string>>> {
-  const file = fs.readFileSync(
-    path.join(process.cwd(), "./src/2024-roster.csv"),
-    "utf8",
-  );
-
-  type RosterRow = {
-    First: string;
-    Last: string;
-    GR: string;
-    Class: string;
-  };
-
-  return new Promise((resolve, reject) => {
-    Papa.parse<RosterRow>(file, {
-      header: true,
-      dynamicTyping: true,
-      error: reject,
-      complete: (results) => {
-        const map = new Map<string, Set<string>>();
-        for (const r of results.data) {
-          if (r.First == null) continue;
-          const key = rosterName(r.First, r.Last);
-          const set = map.get(key) ?? new Set();
-          set.add(cleanupClassName(r.Class));
-          map.set(key, set);
-        }
-        resolve(map);
-      },
-    });
-  });
-}
+// Roster-based validation has been removed — all class decisions come from
+// the Pledgestar CSV (`Class Name`). The old `2024-roster.csv` lookup and
+// autofix logic have been intentionally deleted because the roster is stale.
 
 type OfflinePledgesRow = {
   offlinePledges: number;
@@ -198,8 +156,7 @@ function fullName(firstName: string, lastName: string) {
 }
 
 export async function loadStudents() {
-  const [roster, [csv, lastUpdate], offlinePledges] = await Promise.all([
-    parseRoster(),
+  const [[csv, lastUpdate], offlinePledges] = await Promise.all([
     parseCSV(),
     parseOfflinePledges(),
   ]);
@@ -218,42 +175,9 @@ export async function loadStudents() {
     const lastName = cleanupName(s["Last Name"]);
 
     const pledgestarClass = s["Class Name"]?.split(/[\s,]+/)[0] ?? "";
-    let rosterKey = rosterName(firstName, lastName);
-    // TODO: better way to match nickname / fullname discrepancies
-    if (rosterKey === "finn|shau coldwell") {
-      rosterKey = "finnegan|coldwell";
-    }
-    const rosterClasses = roster.get(rosterKey) ?? new Set();
-
-    let classroom = pledgestarClass;
-    let movedFrom: string | null = null;
-    if (rosterClasses.size === 0) {
-      // console.warn(`${rosterKey} not found in roster`);
-      // TODO: investigate these
-    } else if (rosterClasses.size > 1) {
-      // There are kids with the same name!
-      console.info(
-        `Multiple roster classes found for ${firstName} ${lastName}, skipping autofix`,
-      );
-    } else {
-      const rosterClass = [...rosterClasses.values()][0]!;
-
-      if (rosterClass !== pledgestarClass) {
-        // autofix kids that selected the wrong campus or animal on pledgestar,
-        // but don't move between grades!
-        if (rosterClass.slice(0, 1) === pledgestarClass.slice(0, 1)) {
-          console.warn(
-            `Moved ${firstName} ${lastName} from Pledgestar class ${pledgestarClass} to rostered class ${rosterClass}`,
-          );
-          movedFrom = pledgestarClass;
-          classroom = rosterClass;
-        } else {
-          console.info(
-            `Possible Pledgestar data issue for ${firstName} ${lastName}: pledgestar class '${pledgestarClass}' but roster class '${rosterClass}'`,
-          );
-        }
-      }
-    }
+    // Roster lookup removed — keep the Pledgestar-provided class as authoritative
+    const classroom = pledgestarClass;
+    const movedFrom: string | null = null;
 
     // add offline pledges
     const offlinePledge = offlinePledges.find(
