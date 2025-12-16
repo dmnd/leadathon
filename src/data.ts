@@ -110,9 +110,7 @@ async function parseCSV(): Promise<[Papa.ParseResult<Row>, string]> {
   });
 }
 
-// Roster-based validation has been removed — all class decisions come from
-// the Pledgestar CSV (`Class Name`). The old `2024-roster.csv` lookup and
-// autofix logic have been intentionally deleted because the roster is stale.
+// (Roster lookup removed.)
 
 type OfflinePledgesRow = {
   offlinePledges: number;
@@ -121,6 +119,13 @@ type OfflinePledgesRow = {
   class: string;
 };
 
+// The file `./src/2024-offline-pledges.csv` is kept in the repo as an
+// example showing the expected columns for offline pledge imports. To adapt
+// this for a future year you can either:
+//  - rename the file to `YYYY-offline-pledges.csv` and update the path below,
+//  - or replace this function with logic that selects the latest
+//    `*-offline-pledges.csv` file from `src/` (similar to `parseCSV()`),
+//    if you prefer automatic year detection.
 function parseOfflinePledges(): Promise<OfflinePledgesRow[]> {
   const file = fs.readFileSync(
     path.join(process.cwd(), "./src/2024-offline-pledges.csv"),
@@ -175,7 +180,6 @@ export async function loadStudents() {
     const lastName = cleanupName(s["Last Name"]);
 
     const pledgestarClass = s["Class Name"]?.split(/[\s,]+/)[0] ?? "";
-    // Roster lookup removed — keep the Pledgestar-provided class as authoritative
     const classroom = pledgestarClass;
     const movedFrom: string | null = null;
 
