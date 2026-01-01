@@ -210,8 +210,7 @@ export async function loadStudents() {
     const grade =
       rawGrade === "K" ? 0 : rawGrade === "T" ? -1 : Number.parseInt(rawGrade);
 
-    const pledgesOnline =
-      s["Online Donation #"] + s["Potential Online Donation #"];
+    const pledgesOnline = s["Online Donation #"];
     const pledgesOffline = offlinePledge?.offlinePledges ?? 0;
 
     return [
